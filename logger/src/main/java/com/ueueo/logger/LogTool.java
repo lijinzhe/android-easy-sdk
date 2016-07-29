@@ -1,4 +1,4 @@
-package com.easy.logger;
+package com.ueueo.logger;
 
 public interface LogTool {
     void d(String tag, String message);

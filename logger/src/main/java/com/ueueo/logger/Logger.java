@@ -1,4 +1,4 @@
-package com.easy.logger;
+package com.ueueo.logger;
 
 /**
  * Logger is a wrapper of {@link android.util.Log}

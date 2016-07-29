@@ -1,4 +1,4 @@
-package com.easy.logger;
+package com.ueueo.logger;
 
 import android.util.Log;
 

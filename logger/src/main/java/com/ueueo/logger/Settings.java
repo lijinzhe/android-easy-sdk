@@ -1,4 +1,4 @@
-package com.easy.logger;
+package com.ueueo.logger;
 
 public final class Settings {
 
