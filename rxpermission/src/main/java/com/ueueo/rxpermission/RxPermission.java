@@ -1,17 +1,3 @@
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.ueueo.rxpermission;
 
 import android.annotation.TargetApi;
@@ -40,28 +26,22 @@ public class RxPermission {
     private static final ConcurrentHashMap<String, PublishSubject<Permission>> mSubjects = new ConcurrentHashMap<>();
     private static boolean DEBUG = false;
 
-    public void setDebug(boolean debug) {
+    public static void setDebug(boolean debug) {
         DEBUG = debug;
-    }
-
-    private static void log(String message) {
-        if (DEBUG) {
-            Log.d(TAG, message);
-        }
     }
 
     /**
      * Map emitted items from the source observable into {@code true} if permissions in parameters
      * are granted, or {@code false} if not.
-     * <p>
+     * <p/>
      * If one or several permissions have never been requested, invoke the related framework method
      * to ask the user if he allows the permissions.
      */
-    public Observable.Transformer<Object, Boolean> ensure(final Context context,final Permission... permissions) {
+    public static Observable.Transformer<Object, Boolean> ensure(final Context context, final Permission... permissions) {
         return new Observable.Transformer<Object, Boolean>() {
             @Override
             public Observable<Boolean> call(Observable<Object> o) {
-                return request(context,o, permissions)
+                return request(context, o, permissions)
                         // Transform Observable<Permission> to Observable<Boolean>
                         .buffer(permissions.length)
                         .flatMap(new Func1<List<Permission>, Observable<Boolean>>() {
@@ -89,15 +69,15 @@ public class RxPermission {
     /**
      * Map emitted items from the source observable into {@link Permission} objects for each
      * permission in parameters.
-     * <p>
+     * <p/>
      * If one or several permissions have never been requested, invoke the related framework method
      * to ask the user if he allows the permissions.
      */
-    public Observable.Transformer<Object, Permission> ensureEach(final Context context,final Permission... permissions) {
+    public static Observable.Transformer<Object, Permission> ensureEach(final Context context, final Permission... permissions) {
         return new Observable.Transformer<Object, Permission>() {
             @Override
             public Observable<Permission> call(Observable<Object> o) {
-                return request(context,o, permissions);
+                return request(context, o, permissions);
             }
         };
     }
@@ -106,19 +86,19 @@ public class RxPermission {
      * Request permissions immediately, <b>must be invoked during initialization phase
      * of your application</b>.
      */
-    public Observable<Boolean> request(Context context,final Permission... permissions) {
-        return Observable.just(null).compose(ensure(context,permissions));
+    public static Observable<Boolean> request(Context context, final Permission... permissions) {
+        return Observable.just(null).compose(ensure(context, permissions));
     }
 
     /**
      * Request permissions immediately, <b>must be invoked during initialization phase
      * of your application</b>.
      */
-    public Observable<Permission> requestEach(Context context,final Permission... permissions) {
-        return Observable.just(null).compose(ensureEach(context,permissions));
+    public static Observable<Permission> requestEach(Context context, final Permission... permissions) {
+        return Observable.just(null).compose(ensureEach(context, permissions));
     }
 
-    private Observable<Permission> request(final Context context,final Observable<?> trigger, final Permission... permissions) {
+    private static Observable<Permission> request(final Context context, final Observable<?> trigger, final Permission... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
         }
@@ -126,12 +106,12 @@ public class RxPermission {
                 .flatMap(new Func1<Object, Observable<Permission>>() {
                     @Override
                     public Observable<Permission> call(Object o) {
-                        return request_(context,permissions);
+                        return request_(context, permissions);
                     }
                 });
     }
 
-    private Observable<?> pending(final Permission... permissions) {
+    private static Observable<?> pending(final Permission... permissions) {
         for (Permission p : permissions) {
             if (!mSubjects.containsKey(p)) {
                 return Observable.empty();
@@ -140,7 +120,7 @@ public class RxPermission {
         return Observable.just(null);
     }
 
-    private Observable<?> oneOf(Observable<?> trigger, Observable<?> pending) {
+    private static Observable<?> oneOf(Observable<?> trigger, Observable<?> pending) {
         if (trigger == null) {
             return Observable.just(null);
         }
@@ -148,23 +128,23 @@ public class RxPermission {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private Observable<Permission> request_(Context context,final Permission... permissions) {
+    private static Observable<Permission> request_(Context context, final Permission... permissions) {
 
         List<Observable<Permission>> list = new ArrayList<>(permissions.length);
-        List<Permission> unrequestedPermissions = new ArrayList<>();
+        List<String> unrequestedPermissions = new ArrayList<>();
 
         // In case of multiple permissions, we create a observable for each of them.
         // At the end, the observables are combined to have a unique response.
         for (Permission permission : permissions) {
             log("Requesting permission " + permission);
-            if (isGranted(context,permission)) {
+            if (isGranted(context, permission)) {
                 // Already granted, or not Android M
                 // Return a granted Permission object.
                 list.add(Observable.just(permission.setGranted(true)));
                 continue;
             }
 
-            if (isRevoked(context,permission)) {
+            if (isRevoked(context, permission)) {
                 // Revoked by a policy, return a denied Permission object.
                 list.add(Observable.just(permission.setGranted(false)));
                 continue;
@@ -173,7 +153,7 @@ public class RxPermission {
             PublishSubject<Permission> subject = mSubjects.get(permission);
             // Create a new subject if not exists
             if (subject == null) {
-                unrequestedPermissions.add(permission);
+                unrequestedPermissions.add(permission.name);
                 subject = PublishSubject.create();
                 mSubjects.put(permission.name, subject);
             }
@@ -182,7 +162,7 @@ public class RxPermission {
         }
 
         if (!unrequestedPermissions.isEmpty()) {
-            startShadowActivity(context,unrequestedPermissions.toArray(new String[unrequestedPermissions.size()]));
+            startShadowActivity(context, unrequestedPermissions.toArray(new String[unrequestedPermissions.size()]));
         }
         return Observable.concat(Observable.from(list));
     }
@@ -190,17 +170,17 @@ public class RxPermission {
     /**
      * Invokes Activity.shouldShowRequestPermissionRationale and wraps
      * the returned value in an observable.
-     * <p>
+     * <p/>
      * In case of multiple permissions, only emits true if
      * Activity.shouldShowRequestPermissionRationale returned true for
      * all revoked permissions.
-     * <p>
+     * <p/>
      * You shouldn't call this method if all permissions have been granted.
-     * <p>
+     * <p/>
      * For SDK &lt; 23, the observable will always emit false.
      */
     public static Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity,
-                                                                    final Permission... permissions) {
+                                                                           final Permission... permissions) {
         if (!isMarshmallow()) {
             return Observable.just(false);
         }
@@ -209,16 +189,16 @@ public class RxPermission {
 
     @TargetApi(Build.VERSION_CODES.M)
     private static boolean shouldShowRequestPermissionRationale_(final Activity activity,
-                                                          final Permission... permissions) {
+                                                                 final Permission... permissions) {
         for (Permission p : permissions) {
-            if (!isGranted(activity,p) && !activity.shouldShowRequestPermissionRationale(p.name)) {
+            if (!isGranted(activity, p) && !activity.shouldShowRequestPermissionRationale(p.name)) {
                 return false;
             }
         }
         return true;
     }
 
-    void startShadowActivity(Context context,String[] permissions) {
+    static void startShadowActivity(Context context, String[] permissions) {
         log("startShadowActivity " + TextUtils.join(", ", permissions));
         Intent intent = new Intent(context, ShadowActivity.class);
         intent.putExtra("permissions", permissions);
@@ -228,20 +208,20 @@ public class RxPermission {
 
     /**
      * Returns true if the permission is already granted.
-     * <p>
+     * <p/>
      * Always true if SDK &lt; 23.
      */
-    public static boolean isGranted(Context context,Permission permission) {
-        return !isMarshmallow() || isGranted_(context,permission);
+    public static boolean isGranted(Context context, Permission permission) {
+        return !isMarshmallow() || isGranted_(context, permission);
     }
 
     /**
      * Returns true if the permission has been revoked by a policy.
-     * <p>
+     * <p/>
      * Always false if SDK &lt; 23.
      */
-    public static boolean isRevoked(Context context,Permission permission) {
-        return isMarshmallow() && isRevoked_(context,permission);
+    public static boolean isRevoked(Context context, Permission permission) {
+        return isMarshmallow() && isRevoked_(context, permission);
     }
 
     static boolean isMarshmallow() {
@@ -249,17 +229,16 @@ public class RxPermission {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private static boolean isGranted_(Context context,Permission permission) {
+    private static boolean isGranted_(Context context, Permission permission) {
         return context.checkSelfPermission(permission.name) == PackageManager.PERMISSION_GRANTED;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private static boolean isRevoked_(Context context,Permission permission) {
+    private static boolean isRevoked_(Context context, Permission permission) {
         return context.getPackageManager().isPermissionRevokedByPolicy(permission.name, context.getPackageName());
     }
 
-    static void onRequestPermissionsResult(int requestCode,
-                                    String permissions[], int[] grantResults) {
+    static void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         for (int i = 0, size = permissions.length; i < size; i++) {
             log("onRequestPermissionsResult  " + permissions[i]);
             // Find the corresponding subject
@@ -273,6 +252,12 @@ public class RxPermission {
 
             subject.onNext(Permission.getPermission(permissions[i]).setGranted(granted));
             subject.onCompleted();
+        }
+    }
+
+    private static void log(String message) {
+        if (DEBUG) {
+            Log.d(TAG, message);
         }
     }
 }
