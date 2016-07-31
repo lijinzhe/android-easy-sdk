@@ -2,7 +2,7 @@ package com.ueueo.logger;
 
 public final class Settings {
 
-    private int methodCount = 2;
+    private int methodCount = 1;
     private boolean showThreadInfo = true;
     private int methodOffset = 0;
     private LogTool logTool;

@@ -44,16 +44,12 @@ public final class Logger {
         printer = null;
     }
 
-    public static Printer t(String tag) {
-        return printer.t(tag, printer.getSettings().getMethodCount());
+    public static Printer tag(String tag) {
+        return printer.tag(tag);
     }
 
-    public static Printer t(int methodCount) {
-        return printer.t(null, methodCount);
-    }
-
-    public static Printer t(String tag, int methodCount) {
-        return printer.t(tag, methodCount);
+    public static Printer method(int methodCount) {
+        return printer.method(methodCount);
     }
 
     public static void d(String message, Object... args) {

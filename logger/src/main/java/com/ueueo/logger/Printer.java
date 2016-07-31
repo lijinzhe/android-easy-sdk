@@ -2,7 +2,13 @@ package com.ueueo.logger;
 
 public interface Printer {
 
-    Printer t(String tag, int methodCount);
+    Printer tag(String tag);
+
+    Printer method(int methodCount);
+
+    Printer header(String message, Object... args);
+
+    Printer footer(String message, Object... args);
 
     Settings init(String tag);
 

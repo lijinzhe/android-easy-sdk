@@ -51,8 +51,8 @@ final class LoggerPrinter implements Printer {
     private static final char BOTTOM_LEFT_CORNER = '╚';
     private static final char MIDDLE_CORNER = '╟';
     private static final char HORIZONTAL_DOUBLE_LINE = '║';
-    private static final String DOUBLE_DIVIDER = "════════════════════════════════════════════";
-    private static final String SINGLE_DIVIDER = "────────────────────────────────────────────";
+    private static final String DOUBLE_DIVIDER = "════════════════════════════════════════════════════════════════════════════════════════";
+    private static final String SINGLE_DIVIDER = "────────────────────────────────────────────────────────────────────────────────────────";
     private static final String TOP_BORDER = TOP_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
     private static final String BOTTOM_BORDER = BOTTOM_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
     private static final String MIDDLE_BORDER = MIDDLE_CORNER + SINGLE_DIVIDER + SINGLE_DIVIDER;
@@ -70,6 +70,9 @@ final class LoggerPrinter implements Printer {
      * It is used to determine log settings such as method count, thread info visibility
      */
     private Settings settings;
+
+    private StringBuffer headerMessage = new StringBuffer();
+    private StringBuffer footerMessage = new StringBuffer();
 
     /**
      * It is used to change the tag
@@ -95,11 +98,34 @@ final class LoggerPrinter implements Printer {
     }
 
     @Override
-    public Printer t(String tag, int methodCount) {
+    public Printer tag(String tag) {
         if (tag != null) {
             localTag.set(tag);
         }
+        return this;
+    }
+
+    @Override
+    public Printer method(int methodCount) {
         localMethodCount.set(methodCount);
+        return this;
+    }
+
+    @Override
+    public Printer header(String message, Object... args) {
+        String header = createMessage(message, args);
+        if (!TextUtils.isEmpty(header)) {
+            headerMessage.append(header).append(System.getProperty("line.separator"));
+        }
+        return this;
+    }
+
+    @Override
+    public Printer footer(String message, Object... args) {
+        String footer = createMessage(message, args);
+        if (!TextUtils.isEmpty(footer)) {
+            footerMessage.append(footer).append(System.getProperty("line.separator"));
+        }
         return this;
     }
 
@@ -243,6 +269,9 @@ final class LoggerPrinter implements Printer {
             return;
         }
         String tag = getTag();
+        if (settings.isShowThreadInfo()) {
+            tag += "[" + Thread.currentThread().getName() + "]";
+        }
         String message = createMessage(msg, args);
         int methodCount = getMethodCount();
 
@@ -260,7 +289,28 @@ final class LoggerPrinter implements Printer {
             if (methodCount > 0) {
                 logDivider(logType, tag);
             }
+            String headerString = headerMessage.toString();
+            headerMessage.setLength(0);
+            if (!TextUtils.isEmpty(headerString)) {
+                String[] headers = headerString.split(System.getProperty("line.separator"));
+                for (String header : headers) {
+                    logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + header);
+                }
+                logDivider(logType, tag);
+            }
+
             logContent(logType, tag, message);
+
+            String footerString = footerMessage.toString();
+            footerMessage.setLength(0);
+            if (!TextUtils.isEmpty(footerString)) {
+                logDivider(logType, tag);
+                String[] footers = footerString.split(System.getProperty("line.separator"));
+                for (String footer : footers) {
+                    logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + footer);
+                }
+            }
+
             logBottomBorder(logType, tag);
             return;
         }
@@ -281,10 +331,10 @@ final class LoggerPrinter implements Printer {
 
     private void logHeaderContent(int logType, String tag, int methodCount) {
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-        if (settings.isShowThreadInfo()) {
-            logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " Thread: " + Thread.currentThread().getName());
-            logDivider(logType, tag);
-        }
+//        if (settings.isShowThreadInfo()) {
+//            logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " Thread: " + Thread.currentThread().getName());
+//            logDivider(logType, tag);
+//        }
         String level = "";
 
         int stackOffset = getStackOffset(trace) + settings.getMethodOffset();
@@ -364,8 +414,8 @@ final class LoggerPrinter implements Printer {
     }
 
     private String formatTag(String tag) {
-        if (!TextUtils.isEmpty(tag) && !TextUtils.equals(this.tag, tag)) {
-            return this.tag + "-" + tag;
+        if (!TextUtils.isEmpty(tag)) {
+            return tag;
         }
         return this.tag;
     }
