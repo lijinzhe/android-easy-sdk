@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +13,7 @@ import org.json.JSONObject;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -56,6 +58,7 @@ final class LoggerPrinter implements Printer {
     private static final String TOP_BORDER = TOP_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
     private static final String BOTTOM_BORDER = BOTTOM_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
     private static final String MIDDLE_BORDER = MIDDLE_CORNER + SINGLE_DIVIDER + SINGLE_DIVIDER;
+    private static final String HEADER_FOOTER_SEPARATOR = "3k3o9dwq";
     /**
      * Localize single tag and method count for each thread
      */
@@ -70,7 +73,6 @@ final class LoggerPrinter implements Printer {
      * It is used to determine log settings such as method count, thread info visibility
      */
     private Settings settings;
-
     private StringBuffer headerMessage = new StringBuffer();
     private StringBuffer footerMessage = new StringBuffer();
 
@@ -115,7 +117,7 @@ final class LoggerPrinter implements Printer {
     public Printer header(String message, Object... args) {
         String header = createMessage(message, args);
         if (!TextUtils.isEmpty(header)) {
-            headerMessage.append(header).append(System.getProperty("line.separator"));
+            headerMessage.append(header).append(HEADER_FOOTER_SEPARATOR);
         }
         return this;
     }
@@ -124,8 +126,44 @@ final class LoggerPrinter implements Printer {
     public Printer footer(String message, Object... args) {
         String footer = createMessage(message, args);
         if (!TextUtils.isEmpty(footer)) {
-            footerMessage.append(footer).append(System.getProperty("line.separator"));
+            footerMessage.append(footer).append(HEADER_FOOTER_SEPARATOR);
         }
+        return this;
+    }
+
+    @Override
+    public Printer headerJson(String json) {
+        headerMessage.append(parseJsonMessage(json)).append(HEADER_FOOTER_SEPARATOR);
+        return this;
+    }
+
+    @Override
+    public Printer headerXml(String xml) {
+        headerMessage.append(parseXmlMessage(xml)).append(HEADER_FOOTER_SEPARATOR);
+        return this;
+    }
+
+    @Override
+    public Printer headerObject(Object obj) {
+        headerMessage.append(parseObjectMessage(obj)).append(HEADER_FOOTER_SEPARATOR);
+        return this;
+    }
+
+    @Override
+    public Printer footerJson(String json) {
+        footerMessage.append(parseJsonMessage(json)).append(HEADER_FOOTER_SEPARATOR);
+        return this;
+    }
+
+    @Override
+    public Printer footerXml(String xml) {
+        footerMessage.append(parseXmlMessage(xml)).append(HEADER_FOOTER_SEPARATOR);
+        return this;
+    }
+
+    @Override
+    public Printer footerObject(Object obj) {
+        footerMessage.append(parseObjectMessage(obj)).append(HEADER_FOOTER_SEPARATOR);
         return this;
     }
 
@@ -180,26 +218,7 @@ final class LoggerPrinter implements Printer {
      */
     @Override
     public void json(String json) {
-        if (TextUtils.isEmpty(json)) {
-            d("Empty/Null json content");
-            return;
-        }
-        try {
-            json = json.trim();
-            if (json.startsWith("{")) {
-                JSONObject jsonObject = new JSONObject(json);
-                String message = jsonObject.toString(JSON_INDENT);
-                d(message);
-                return;
-            }
-            if (json.startsWith("[")) {
-                JSONArray jsonArray = new JSONArray(json);
-                String message = jsonArray.toString(JSON_INDENT);
-                d(message);
-            }
-        } catch (JSONException e) {
-            e(e.getCause().getMessage() + "\n" + json);
-        }
+        d(parseJsonMessage(json));
     }
 
     /**
@@ -209,21 +228,7 @@ final class LoggerPrinter implements Printer {
      */
     @Override
     public void xml(String xml) {
-        if (TextUtils.isEmpty(xml)) {
-            d("Empty/Null xml content");
-            return;
-        }
-        try {
-            Source xmlInput = new StreamSource(new StringReader(xml));
-            StreamResult xmlOutput = new StreamResult(new StringWriter());
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            transformer.transform(xmlInput, xmlOutput);
-            d(xmlOutput.getWriter().toString().replaceFirst(">", ">\n"));
-        } catch (TransformerException e) {
-            e(e.getCause().getMessage() + "\n" + xml);
-        }
+        d(parseXmlMessage(xml));
     }
 
     /**
@@ -233,27 +238,7 @@ final class LoggerPrinter implements Printer {
      */
     @Override
     public void object(Object obj) {
-        if (obj == null) {
-            d("Null obj content");
-            return;
-        }
-        try {
-            if (obj instanceof List) {
-                JSONArray jsonArray = new JSONArray();
-                for (Object o : (List) obj) {
-                    JSONObject jo = new JSONObject(new Gson().toJson(o));
-                    jsonArray.put(jo);
-                }
-                String message = jsonArray.toString(JSON_INDENT);
-                d(message);
-            } else {
-                JSONObject jsonObject = new JSONObject(new Gson().toJson(obj));
-                String message = jsonObject.toString(JSON_INDENT);
-                d(message);
-            }
-        } catch (JSONException e) {
-            e(e.getCause().getMessage() + "\n" + obj);
-        }
+        d(parseObjectMessage(obj));
     }
 
     @Override
@@ -292,11 +277,14 @@ final class LoggerPrinter implements Printer {
             String headerString = headerMessage.toString();
             headerMessage.setLength(0);
             if (!TextUtils.isEmpty(headerString)) {
-                String[] headers = headerString.split(System.getProperty("line.separator"));
+                String[] headers = headerString.split(HEADER_FOOTER_SEPARATOR);
                 for (String header : headers) {
-                    logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + header);
+                    String[] lines = header.split(System.getProperty("line.separator"));
+                    for (String line : lines) {
+                        logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
+                    }
+                    logDivider(logType, tag);
                 }
-                logDivider(logType, tag);
             }
 
             logContent(logType, tag, message);
@@ -304,10 +292,13 @@ final class LoggerPrinter implements Printer {
             String footerString = footerMessage.toString();
             footerMessage.setLength(0);
             if (!TextUtils.isEmpty(footerString)) {
-                logDivider(logType, tag);
-                String[] footers = footerString.split(System.getProperty("line.separator"));
+                String[] footers = footerString.split(HEADER_FOOTER_SEPARATOR);
                 for (String footer : footers) {
-                    logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + footer);
+                    logDivider(logType, tag);
+                    String[] lines = footer.split(System.getProperty("line.separator"));
+                    for (String line : lines) {
+                        logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
+                    }
                 }
             }
 
@@ -466,4 +457,73 @@ final class LoggerPrinter implements Printer {
         return -1;
     }
 
+    private String parseXmlMessage(String xml) {
+        if (!TextUtils.isEmpty(xml)) {
+            try {
+                Source xmlInput = new StreamSource(new StringReader(xml));
+                StreamResult xmlOutput = new StreamResult(new StringWriter());
+                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                transformer.transform(xmlInput, xmlOutput);
+                return xmlOutput.getWriter().toString().replaceFirst(">", ">\n");
+            } catch (TransformerException e) {
+                return "Invalid xml content";
+            }
+        } else {
+            return "Empty/Null xml content";
+        }
+    }
+
+    private String parseJsonMessage(String json) {
+        if (!TextUtils.isEmpty(json)) {
+            try {
+                json = json.trim();
+                if (json.startsWith("{")) {
+                    JSONObject jsonObject = new JSONObject(json);
+                    String message = jsonObject.toString(JSON_INDENT);
+                    return message;
+                } else if (json.startsWith("[")) {
+                    JSONArray jsonArray = new JSONArray(json);
+                    String message = jsonArray.toString(JSON_INDENT);
+                    return message;
+                } else {
+                    return "Invalid json content";
+                }
+            } catch (JSONException e) {
+                return "Invalid json content";
+            }
+        } else {
+            return "Empty/Null json content";
+        }
+    }
+
+    private String parseObjectMessage(Object obj) {
+        if (obj != null) {
+            try {
+                if (obj instanceof List) {
+                    JSONArray jsonArray = new JSONArray();
+                    for (Object o : (List) obj) {
+                        JSONObject jo = new JSONObject(new Gson().toJson(o));
+                        jsonArray.put(jo);
+                    }
+                    String message = jsonArray.toString(JSON_INDENT);
+                    return message;
+                } else if (obj instanceof Map) {
+                    Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+                    JSONObject jsonObject = new JSONObject(gson.toJson(obj));
+                    String message = jsonObject.toString(JSON_INDENT);
+                    return message;
+                } else {
+                    JSONObject jsonObject = new JSONObject(new Gson().toJson(obj));
+                    String message = jsonObject.toString(JSON_INDENT);
+                    return message;
+                }
+            } catch (JSONException e) {
+                return "Invalid object content";
+            }
+        }else {
+            return "Null object content";
+        }
+    }
 }
