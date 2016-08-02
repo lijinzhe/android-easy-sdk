@@ -16,18 +16,28 @@
  *
  */
 
-package com.ueueo.photopicker.data;
+package com.ueueo.photopicker;
 
-
-import com.ueueo.photopicker.bean.ImageSet;
-
-import java.util.List;
+import android.widget.ImageView;
 
 /**
- * <b>Listener when data ready</b><br/>
+ * <b>desc your class</b><br/>
  * Created by Eason.Lai on 2015/11/1 10:42 <br/>
  * contact：easonline7@gmail.com <br/>
  */
-public interface OnImagesLoadedListener {
-    void onImagesLoaded(List<ImageSet> imageSetList);
+public class GlideImgLoader implements ImgLoader {
+    @Override
+    public void onPresentImage(ImageView imageView, String imageUri, int size) {
+//        Glide.with(imageView.getContext())
+//                .load(new File(imageUri))
+//                .centerCrop()
+//                .dontAnimate()
+//                .thumbnail(0.5f)
+//                .override(size/4*3, size/4*3)
+//                .placeholder(R.drawable.default_img)
+//                .error(R.drawable.default_img)
+//                .into(imageView);
+
+    }
+
 }

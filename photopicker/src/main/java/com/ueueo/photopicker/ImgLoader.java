@@ -16,18 +16,16 @@
  *
  */
 
-package com.ueueo.photopicker.data;
+package com.ueueo.photopicker;
 
-
-import com.ueueo.photopicker.bean.ImageSet;
-
-import java.util.List;
+import android.widget.ImageView;
 
 /**
- * <b>Listener when data ready</b><br/>
+ * <b>interface for image showing</b><br/>
+ * you can implements it with UIL,picasso or glide <br/>
  * Created by Eason.Lai on 2015/11/1 10:42 <br/>
  * contact：easonline7@gmail.com <br/>
  */
-public interface OnImagesLoadedListener {
-    void onImagesLoaded(List<ImageSet> imageSetList);
+public interface ImgLoader {
+    void onPresentImage(ImageView imageView, String imageUri, int size);
 }

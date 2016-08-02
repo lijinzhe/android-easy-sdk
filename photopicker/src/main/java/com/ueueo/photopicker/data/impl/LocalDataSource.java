@@ -16,7 +16,7 @@
  *
  */
 
-package com.ueueo.photopicker.data;
+package com.ueueo.photopicker.data.impl;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -27,9 +27,12 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
+import com.ueueo.photopicker.AndroidImagePicker;
 import com.ueueo.photopicker.R;
-import com.ueueo.photopicker.base.PhotoAlbum;
-import com.ueueo.photopicker.base.PhotoItem;
+import com.ueueo.photopicker.bean.ImageItem;
+import com.ueueo.photopicker.bean.ImageSet;
+import com.ueueo.photopicker.data.DataSource;
+import com.ueueo.photopicker.data.OnImagesLoadedListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,7 +43,7 @@ import java.util.List;
  * Created by Eason.Lai on 2015/11/1 10:42
  * contact：easonline7@gmail.com
  */
-public class LocalDataSource implements LoaderManager.LoaderCallbacks<Cursor>{
+public class LocalDataSource implements DataSource, LoaderManager.LoaderCallbacks<Cursor>{
 
     private final String[] IMAGE_PROJECTION = {
             MediaStore.Images.Media.DATA,
@@ -55,8 +58,9 @@ public class LocalDataSource implements LoaderManager.LoaderCallbacks<Cursor>{
     OnImagesLoadedListener imagesLoadedListener;
     Context mContext;
     // ImageSet data
-    private ArrayList<PhotoAlbum> mImageSetList = new ArrayList<>();
+    private ArrayList<ImageSet> mImageSetList = new ArrayList<>();
 
+    @Override
     public void provideMediaItems(OnImagesLoadedListener loadedListener) {
         this.imagesLoadedListener = loadedListener;
         if(mContext instanceof FragmentActivity){
@@ -91,7 +95,7 @@ public class LocalDataSource implements LoaderManager.LoaderCallbacks<Cursor>{
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mImageSetList.clear();
         if(data != null){
-            List<PhotoItem> allImages = new ArrayList<>();
+            List<ImageItem> allImages = new ArrayList<>();
             int count = data.getCount();
             if(count <= 0 ){
                 return;
@@ -103,32 +107,32 @@ public class LocalDataSource implements LoaderManager.LoaderCallbacks<Cursor>{
                 String imageName = data.getString(data.getColumnIndexOrThrow(IMAGE_PROJECTION[1]));
                 long imageAddedTime = data.getLong(data.getColumnIndexOrThrow(IMAGE_PROJECTION[2]));
 
-                PhotoItem item = new PhotoItem(imagePath,imageName,imageAddedTime);
+                ImageItem item = new ImageItem(imagePath,imageName,imageAddedTime);
                 allImages.add(item);
 
                 File imageFile = new File(imagePath);
                 File imageParentFile = imageFile.getParentFile();
 
-                PhotoAlbum imageSet = new PhotoAlbum();
+                ImageSet imageSet = new ImageSet();
                 imageSet.name = imageParentFile.getName();
                 imageSet.path = imageParentFile.getAbsolutePath();
                 imageSet.cover = item;
 
                 if(!mImageSetList.contains(imageSet)){
-                    List<PhotoItem> imageList = new ArrayList<>();
+                    List<ImageItem> imageList = new ArrayList<>();
                     imageList.add(item);
-                    imageSet.photoItems = imageList;
+                    imageSet.imageItems = imageList;
                     mImageSetList.add(imageSet);
                 } else {
-                    mImageSetList.get(mImageSetList.indexOf(imageSet)).photoItems.add(item);
+                    mImageSetList.get(mImageSetList.indexOf(imageSet)).imageItems.add(item);
                 }
 
             }while(data.moveToNext());
 
-            PhotoAlbum imageSetAll = new PhotoAlbum();
+            ImageSet imageSetAll = new ImageSet();
             imageSetAll.name= mContext.getResources().getString(R.string.all_images);
             imageSetAll.cover = allImages.get(0);
-            imageSetAll.photoItems = allImages;
+            imageSetAll.imageItems = allImages;
             imageSetAll.path = "/";
 
             if(mImageSetList.contains(imageSetAll)){
@@ -138,7 +142,7 @@ public class LocalDataSource implements LoaderManager.LoaderCallbacks<Cursor>{
 
             imagesLoadedListener.onImagesLoaded(mImageSetList);//notify the data changed
 
-//            AndroidImagePicker.getInstance().setImageSets(mImageSetList);
+            AndroidImagePicker.getInstance().setImageSets(mImageSetList);
 
         }
 
