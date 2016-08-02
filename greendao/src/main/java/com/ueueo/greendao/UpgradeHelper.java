@@ -2,7 +2,6 @@ package com.ueueo.greendao;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.greenrobot.greendao.AbstractDao;
@@ -39,18 +38,18 @@ public class UpgradeHelper {
         }
     }
 
-    private static void dropAllTables(Database db, boolean ifExists, @NonNull Class<? extends AbstractDao<?, ?>>... daoClasses) {
+    private static void dropAllTables(Database db, boolean ifExists,  Class<? extends AbstractDao<?, ?>>... daoClasses) {
         reflectMethod(db, "dropTable", ifExists, daoClasses);
     }
 
-    private static void createAllTables(Database db, boolean ifNotExists, @NonNull Class<? extends AbstractDao<?, ?>>... daoClasses) {
+    private static void createAllTables(Database db, boolean ifNotExists,   Class<? extends AbstractDao<?, ?>>... daoClasses) {
         reflectMethod(db, "createTable", ifNotExists, daoClasses);
     }
 
     /**
      * dao class already define the sql exec method, so just invoke it
      */
-    private static void reflectMethod(Database db, String methodName, boolean isExists, @NonNull Class<? extends AbstractDao<?, ?>>... daoClasses) {
+    private static void reflectMethod(Database db, String methodName, boolean isExists,   Class<? extends AbstractDao<?, ?>>... daoClasses) {
         if (daoClasses.length < 1) {
             return;
         }
