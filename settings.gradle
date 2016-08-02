@@ -1,1 +1,1 @@
-include ':sample', ':logger'
+include ':sample', ':logger', ':photopicker', ':rxpermission', ':cache', ':greendao', ':rxbus'

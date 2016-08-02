@@ -44,9 +44,9 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ueueo.photopicker.AndroidImagePicker;
+import com.ueueo.photopicker.PhotoPicker;
 import com.ueueo.photopicker.GlideImgLoader;
-import com.ueueo.photopicker.ImgLoader;
+import com.ueueo.photopicker.ImageLoader;
 import com.ueueo.photopicker.R;
 import com.ueueo.photopicker.Util;
 import com.ueueo.photopicker.bean.ImageItem;
@@ -66,7 +66,7 @@ import java.util.List;
  * Created by Eason.Lai on 2015/11/1 10:42 <br/>
  * contact：easonline7@gmail.com <br/>
  */
-public class ImagesGridFragment extends Fragment implements OnImagesLoadedListener,AndroidImagePicker.OnImageSelectedChangeListener,AndroidImagePicker.OnImageCropCompleteListener{
+public class ImagesGridFragment extends Fragment implements OnImagesLoadedListener,PhotoPicker.OnImageSelectedChangeListener,PhotoPicker.OnImageCropCompleteListener{
     private static final String TAG = ImagesGridFragment.class.getSimpleName();
 
     Activity mContext;
@@ -81,8 +81,8 @@ public class ImagesGridFragment extends Fragment implements OnImagesLoadedListen
     private ImageSetAdapter mImageSetAdapter;
     List<ImageSet> mImageSetList;//data of all ImageSets
 
-    ImgLoader mImagePresenter;
-    AndroidImagePicker androidImagePicker;
+    ImageLoader mImagePresenter;
+    PhotoPicker androidImagePicker;
 
     private OnItemClickListener mOnItemClickListener;//Grid Item click Listener
 
@@ -94,7 +94,7 @@ public class ImagesGridFragment extends Fragment implements OnImagesLoadedListen
         super.onCreate(savedInstanceState);
         mContext = getActivity();
 
-        androidImagePicker = AndroidImagePicker.getInstance();
+        androidImagePicker = PhotoPicker.getInstance();
         //androidImagePicker.clear();
 
         androidImagePicker.addOnImageSelectedChangeListener(this);
@@ -160,7 +160,7 @@ public class ImagesGridFragment extends Fragment implements OnImagesLoadedListen
 
     @Override
     public void onImageSelectChange(int position, ImageItem item, int selectedItemsCount, int maxSelectLimit) {
-        mAdapter.refreshData(AndroidImagePicker.getInstance().getImageItemsOfCurrentImageSet());
+        mAdapter.refreshData(PhotoPicker.getInstance().getImageItemsOfCurrentImageSet());
         Log.i(TAG,"=====EVENT:onImageSelectChange");
     }
 
@@ -229,7 +229,7 @@ public class ImagesGridFragment extends Fragment implements OnImagesLoadedListen
                     @Override
                     public void onClick(View v) {
                         try {
-                            androidImagePicker.takePicture(ImagesGridFragment.this,AndroidImagePicker.REQ_CAMERA);
+                            androidImagePicker.takePicture(ImagesGridFragment.this, PhotoPicker.REQ_CAMERA);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -332,7 +332,7 @@ public class ImagesGridFragment extends Fragment implements OnImagesLoadedListen
     }
 
     private boolean shouldSelectMulti(){
-        return androidImagePicker.getSelectMode() == AndroidImagePicker.Select_Mode.MODE_MULTI;
+        return androidImagePicker.getSelectMode() == PhotoPicker.Select_Mode.MODE_MULTI;
     }
 
     private boolean shouldShowCamera(){
@@ -525,17 +525,17 @@ public class ImagesGridFragment extends Fragment implements OnImagesLoadedListen
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == AndroidImagePicker.REQ_CAMERA && resultCode == Activity.RESULT_OK){
+        if(requestCode == PhotoPicker.REQ_CAMERA && resultCode == Activity.RESULT_OK){
             if(!TextUtils.isEmpty(androidImagePicker.getCurrentPhotoPath())){
-                AndroidImagePicker.galleryAddPic(mContext,androidImagePicker.getCurrentPhotoPath() );
+                PhotoPicker.galleryAddPic(mContext,androidImagePicker.getCurrentPhotoPath() );
                 getActivity().finish();
                 //androidImagePicker.notifyPictureTaken();
 
                 if(androidImagePicker.cropMode){//裁图模式
                     Intent intent = new Intent();
                     intent.setClass(mContext,ImageCropActivity.class);
-                    intent.putExtra(AndroidImagePicker.KEY_PIC_PATH,androidImagePicker.getCurrentPhotoPath());
-                    startActivityForResult(intent, AndroidImagePicker.REQ_CAMERA);
+                    intent.putExtra(PhotoPicker.KEY_PIC_PATH,androidImagePicker.getCurrentPhotoPath());
+                    startActivityForResult(intent, PhotoPicker.REQ_CAMERA);
                 }else{
                     ImageItem item = new ImageItem(androidImagePicker.getCurrentPhotoPath(),"",-1);
                     androidImagePicker.clearSelectedImages();

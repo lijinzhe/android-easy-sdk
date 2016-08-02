@@ -27,7 +27,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
-import com.ueueo.photopicker.AndroidImagePicker;
+import com.ueueo.photopicker.PhotoPicker;
 import com.ueueo.photopicker.R;
 import com.ueueo.photopicker.bean.ImageItem;
 import com.ueueo.photopicker.bean.ImageSet;
@@ -142,7 +142,7 @@ public class LocalDataSource implements DataSource, LoaderManager.LoaderCallback
 
             imagesLoadedListener.onImagesLoaded(mImageSetList);//notify the data changed
 
-            AndroidImagePicker.getInstance().setImageSets(mImageSetList);
+            PhotoPicker.getInstance().setImageSets(mImageSetList);
 
         }
 

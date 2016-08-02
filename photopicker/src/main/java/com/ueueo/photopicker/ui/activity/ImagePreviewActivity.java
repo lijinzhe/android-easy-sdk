@@ -29,7 +29,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ueueo.photopicker.AndroidImagePicker;
+import com.ueueo.photopicker.PhotoPicker;
 import com.ueueo.photopicker.R;
 import com.ueueo.photopicker.bean.ImageItem;
 import com.ueueo.photopicker.ui.ImagePreviewFragment;
@@ -37,7 +37,7 @@ import com.ueueo.photopicker.ui.ImagePreviewFragment;
 import java.io.Serializable;
 import java.util.List;
 
-public class ImagePreviewActivity extends FragmentActivity implements View.OnClickListener,ImagePreviewFragment.OnImageSingleTapClickListener,ImagePreviewFragment.OnImagePageSelectedListener,AndroidImagePicker.OnImageSelectedChangeListener {
+public class ImagePreviewActivity extends FragmentActivity implements View.OnClickListener,ImagePreviewFragment.OnImageSingleTapClickListener,ImagePreviewFragment.OnImagePageSelectedListener,PhotoPicker.OnImageSelectedChangeListener {
     private static final String TAG = ImagePreviewActivity.class.getSimpleName();
 
     ImagePreviewFragment mFragment;
@@ -47,18 +47,18 @@ public class ImagePreviewActivity extends FragmentActivity implements View.OnCli
 
     List<ImageItem> mImageList;
     int mShowItemPosition = 0;
-    AndroidImagePicker androidImagePicker;
+    PhotoPicker androidImagePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_pre);
 
-        androidImagePicker = AndroidImagePicker.getInstance();
+        androidImagePicker = PhotoPicker.getInstance();
         androidImagePicker.addOnImageSelectedChangeListener(this);
 
-        mImageList = AndroidImagePicker.getInstance().getImageItemsOfCurrentImageSet();
-        mShowItemPosition = getIntent().getIntExtra(AndroidImagePicker.KEY_PIC_SELECTED_POSITION,0);
+        mImageList = PhotoPicker.getInstance().getImageItemsOfCurrentImageSet();
+        mShowItemPosition = getIntent().getIntExtra(PhotoPicker.KEY_PIC_SELECTED_POSITION,0);
 
         mBtnOk = (TextView) findViewById(R.id.btn_ok);
         mBtnOk.setOnClickListener(this);
@@ -67,7 +67,7 @@ public class ImagePreviewActivity extends FragmentActivity implements View.OnCli
         mTitleCount = (TextView) findViewById(R.id.tv_title_count);
         mTitleCount.setText("1/" + mImageList.size());
 
-        int selectedCount = AndroidImagePicker.getInstance().getSelectImageCount();
+        int selectedCount = PhotoPicker.getInstance().getSelectImageCount();
 
         onImageSelectChange(0, null, selectedCount, androidImagePicker.getSelectLimit());
 
@@ -108,8 +108,8 @@ public class ImagePreviewActivity extends FragmentActivity implements View.OnCli
 
         mFragment = new ImagePreviewFragment();
         Bundle data = new Bundle();
-        data.putSerializable(AndroidImagePicker.KEY_PIC_PATH, (Serializable) mImageList);
-        data.putInt(AndroidImagePicker.KEY_PIC_SELECTED_POSITION, mShowItemPosition);
+        data.putSerializable(PhotoPicker.KEY_PIC_PATH, (Serializable) mImageList);
+        data.putInt(PhotoPicker.KEY_PIC_SELECTED_POSITION, mShowItemPosition);
         mFragment.setArguments(data);
 
         getSupportFragmentManager().beginTransaction()

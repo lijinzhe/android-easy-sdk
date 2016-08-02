@@ -34,9 +34,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ueueo.photopicker.AndroidImagePicker;
+import com.ueueo.photopicker.PhotoPicker;
 import com.ueueo.photopicker.GlideImgLoader;
-import com.ueueo.photopicker.ImgLoader;
+import com.ueueo.photopicker.ImageLoader;
 import com.ueueo.photopicker.R;
 import com.ueueo.photopicker.bean.ImageItem;
 import com.ueueo.photopicker.widget.TouchImageView;
@@ -61,15 +61,15 @@ public class ImagePreviewFragment extends Fragment{
 
     private boolean enableSingleTap = true;//singleTap to do something
 
-    ImgLoader mImagePresenter;//interface to load image,you can implements it with your own code
-    AndroidImagePicker androidImagePicker;
+    ImageLoader mImagePresenter;//interface to load image,you can implements it with your own code
+    PhotoPicker androidImagePicker;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getActivity();
         //mSelectedImages = new SparseArray<>();
-        androidImagePicker = AndroidImagePicker.getInstance();
+        androidImagePicker = PhotoPicker.getInstance();
 
     }
 
@@ -78,7 +78,7 @@ public class ImagePreviewFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.fragment_preview,null);
         mImageList = androidImagePicker.getImageItemsOfCurrentImageSet();
-        mCurrentItemPosition = getArguments().getInt(AndroidImagePicker.KEY_PIC_SELECTED_POSITION,0);
+        mCurrentItemPosition = getArguments().getInt(PhotoPicker.KEY_PIC_SELECTED_POSITION,0);
         mImagePresenter = new GlideImgLoader();
         initView(contentView);
         return contentView;
@@ -125,11 +125,11 @@ public class ImagePreviewFragment extends Fragment{
         boolean isSelect = androidImagePicker.isSelect(mCurrentItemPosition,item);
         if(isCheck){
             if(!isSelect){
-                AndroidImagePicker.getInstance().addSelectedImageItem(mCurrentItemPosition,item);
+                PhotoPicker.getInstance().addSelectedImageItem(mCurrentItemPosition,item);
             }
         }else{
             if(isSelect){
-                AndroidImagePicker.getInstance().deleteSelectedImageItem(mCurrentItemPosition, item);
+                PhotoPicker.getInstance().deleteSelectedImageItem(mCurrentItemPosition, item);
             }
         }
 

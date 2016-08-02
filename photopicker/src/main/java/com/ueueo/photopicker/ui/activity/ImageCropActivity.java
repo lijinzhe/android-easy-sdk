@@ -25,7 +25,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.ueueo.photopicker.AndroidImagePicker;
+import com.ueueo.photopicker.PhotoPicker;
 import com.ueueo.photopicker.R;
 import com.ueueo.photopicker.ui.AvatarCropFragment;
 
@@ -53,10 +53,10 @@ public class ImageCropActivity extends FragmentActivity implements View.OnClickL
         btnOk.setOnClickListener(this);
         btnReChoose.setOnClickListener(this);
 
-        imagePath = getIntent().getStringExtra(AndroidImagePicker.KEY_PIC_PATH);
+        imagePath = getIntent().getStringExtra(PhotoPicker.KEY_PIC_PATH);
         mFragment = new AvatarCropFragment();
         Bundle data = new Bundle();
-        data.putString(AndroidImagePicker.KEY_PIC_PATH,imagePath);
+        data.putString(PhotoPicker.KEY_PIC_PATH,imagePath);
         mFragment.setArguments(data);
 
         getSupportFragmentManager().beginTransaction()
@@ -69,9 +69,9 @@ public class ImageCropActivity extends FragmentActivity implements View.OnClickL
     public void onClick(View v) {
 
         if(v.getId() == R.id.btn_pic_ok){
-            Bitmap bmp = mFragment.getCropBitmap(AndroidImagePicker.getInstance().cropSize);
+            Bitmap bmp = mFragment.getCropBitmap(PhotoPicker.getInstance().cropSize);
             finish();
-            AndroidImagePicker.getInstance().notifyImageCropComplete(bmp,0);
+            PhotoPicker.getInstance().notifyImageCropComplete(bmp,0);
         }else if(v.getId() == R.id.btn_pic_rechoose){
             finish();
         }

@@ -34,9 +34,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.ueueo.photopicker.AndroidImagePicker;
+import com.ueueo.photopicker.PhotoPicker;
 import com.ueueo.photopicker.GlideImgLoader;
-import com.ueueo.photopicker.ImgLoader;
+import com.ueueo.photopicker.ImageLoader;
 import com.ueueo.photopicker.R;
 import com.ueueo.photopicker.Util;
 import com.ueueo.photopicker.widget.AvatarRectView;
@@ -61,7 +61,7 @@ public class AvatarCropFragment extends Fragment{
 
     private String picPath;//the local image path in sdcard
 
-    ImgLoader mImagePresenter;//interface to load image,you can implement it with your own code
+    ImageLoader mImagePresenter;//interface to load image,you can implement it with your own code
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,7 +82,7 @@ public class AvatarCropFragment extends Fragment{
         initView(contentView);
 
         //get the image path from Arguments
-        picPath = getArguments().getString(AndroidImagePicker.KEY_PIC_PATH);
+        picPath = getArguments().getString(PhotoPicker.KEY_PIC_PATH);
 
         mImagePresenter = new GlideImgLoader();
 
@@ -128,7 +128,7 @@ public class AvatarCropFragment extends Fragment{
         Rect centerRect = mRectView.getCropRect();
         RectF matrixRect = superImageView.getMatrixRect();
 
-        Bitmap bmp = AndroidImagePicker.makeCropBitmap(srcBitmap, centerRect, matrixRect, expectSize);
+        Bitmap bmp = PhotoPicker.makeCropBitmap(srcBitmap, centerRect, matrixRect, expectSize);
         return bmp;
     }
 

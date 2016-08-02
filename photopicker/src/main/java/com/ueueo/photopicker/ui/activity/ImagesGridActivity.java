@@ -27,18 +27,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
-import com.ueueo.photopicker.AndroidImagePicker;
+import com.ueueo.photopicker.PhotoPicker;
 import com.ueueo.photopicker.R;
 import com.ueueo.photopicker.bean.ImageItem;
 import com.ueueo.photopicker.ui.ImagesGridFragment;
 
-public class ImagesGridActivity extends FragmentActivity implements View.OnClickListener,AndroidImagePicker.OnImageSelectedChangeListener {
+public class ImagesGridActivity extends FragmentActivity implements View.OnClickListener,PhotoPicker.OnImageSelectedChangeListener {
     private static final String TAG = ImagesGridActivity.class.getSimpleName();
 
     private TextView mBtnOk;
 
     ImagesGridFragment mFragment;
-    AndroidImagePicker androidImagePicker;
+    PhotoPicker androidImagePicker;
     String imagePath;
 
     @Override
@@ -46,13 +46,13 @@ public class ImagesGridActivity extends FragmentActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_images_grid);
 
-        androidImagePicker = AndroidImagePicker.getInstance();
+        androidImagePicker = PhotoPicker.getInstance();
         androidImagePicker.clearSelectedImages();//most of the time you need to clear the last selected images or you can comment out this line
 
         mBtnOk = (TextView) findViewById(R.id.btn_ok);
         mBtnOk.setOnClickListener(this);
 
-        if(androidImagePicker.getSelectMode() == AndroidImagePicker.Select_Mode.MODE_SINGLE){
+        if(androidImagePicker.getSelectMode() == PhotoPicker.Select_Mode.MODE_SINGLE){
             mBtnOk.setVisibility(View.GONE);
         }else{
             mBtnOk.setVisibility(View.VISIBLE);
@@ -67,7 +67,7 @@ public class ImagesGridActivity extends FragmentActivity implements View.OnClick
 
         //final boolean isCrop = getIntent().getBooleanExtra("isCrop",false);
         final boolean isCrop = androidImagePicker.cropMode;
-        imagePath = getIntent().getStringExtra(AndroidImagePicker.KEY_PIC_PATH);
+        imagePath = getIntent().getStringExtra(PhotoPicker.KEY_PIC_PATH);
         mFragment = new ImagesGridFragment();
         /*Bundle data = new Bundle();
         data.putString(AndroidImagePicker.KEY_PIC_PATH,imagePath);
@@ -79,13 +79,13 @@ public class ImagesGridActivity extends FragmentActivity implements View.OnClick
 
                 position = androidImagePicker.isShouldShowCamera() ? position-1 : position;
 
-                if(androidImagePicker.getSelectMode() == AndroidImagePicker.Select_Mode.MODE_MULTI){
+                if(androidImagePicker.getSelectMode() == PhotoPicker.Select_Mode.MODE_MULTI){
                     go2Preview(position);
-                }else if(androidImagePicker.getSelectMode() == AndroidImagePicker.Select_Mode.MODE_SINGLE){
+                }else if(androidImagePicker.getSelectMode() == PhotoPicker.Select_Mode.MODE_SINGLE){
                     if(isCrop){
                         Intent intent = new Intent();
                         intent.setClass(ImagesGridActivity.this,ImageCropActivity.class);
-                        intent.putExtra(AndroidImagePicker.KEY_PIC_PATH,androidImagePicker.getImageItemsOfCurrentImageSet().get(position).path);
+                        intent.putExtra(PhotoPicker.KEY_PIC_PATH,androidImagePicker.getImageItemsOfCurrentImageSet().get(position).path);
                         startActivity(intent);
                     }else{
                         androidImagePicker.clearSelectedImages();
@@ -116,9 +116,9 @@ public class ImagesGridActivity extends FragmentActivity implements View.OnClick
      */
     private void go2Preview(int position) {
         Intent intent = new Intent();
-        intent.putExtra(AndroidImagePicker.KEY_PIC_SELECTED_POSITION, position);
+        intent.putExtra(PhotoPicker.KEY_PIC_SELECTED_POSITION, position);
         intent.setClass(ImagesGridActivity.this, ImagePreviewActivity.class);
-        startActivityForResult(intent, AndroidImagePicker.REQ_PREVIEW);
+        startActivityForResult(intent, PhotoPicker.REQ_PREVIEW);
     }
 
 
@@ -162,7 +162,7 @@ public class ImagesGridActivity extends FragmentActivity implements View.OnClick
 
         if(resultCode == Activity.RESULT_OK){
 
-           if(requestCode == AndroidImagePicker.REQ_PREVIEW){
+           if(requestCode == PhotoPicker.REQ_PREVIEW){
                 setResult(RESULT_OK);
                 finish();
                 androidImagePicker.notifyOnImagePickComplete();

@@ -25,7 +25,7 @@ import android.widget.ImageView;
  * Created by Eason.Lai on 2015/11/1 10:42 <br/>
  * contact：easonline7@gmail.com <br/>
  */
-public class GlideImgLoader implements ImgLoader {
+public class GlideImgLoader implements ImageLoader {
     @Override
     public void onPresentImage(ImageView imageView, String imageUri, int size) {
 //        Glide.with(imageView.getContext())
