@@ -21,6 +21,15 @@ public final class Logger {
     }
 
     /**
+     * 判断是否可以打印Debug级别的日志
+     *
+     * @return
+     */
+    public static boolean isDebugEnabled() {
+        return (printer.getSettings().getLogLevel() >= LogLevel.DEBUG);
+    }
+
+    /**
      * It is used to get the settings object in order to change settings
      *
      * @return the settings object
