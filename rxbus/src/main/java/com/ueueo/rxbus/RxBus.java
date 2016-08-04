@@ -18,4 +18,5 @@ public class RxBus {
     public static <T> Observable<T> toObserverable(Class<T> eventType) {
         return bus.ofType(eventType);
     }
+
 }
