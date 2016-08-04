@@ -1,4 +1,4 @@
-package com.ueueo.logger;
+package com.ueueo.log;
 
 import android.content.Context;
 import android.util.Log;

@@ -1,6 +1,4 @@
-package com.ueueo.logger;
-
-import org.json.JSONObject;
+package com.ueueo.log;
 
 public interface Printer {
 

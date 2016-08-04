@@ -1,4 +1,4 @@
-package com.ueueo.logger;
+package com.ueueo.log;
 
 /**
  * Log级别
