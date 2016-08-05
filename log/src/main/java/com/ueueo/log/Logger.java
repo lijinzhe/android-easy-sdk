@@ -26,7 +26,7 @@ public final class Logger {
      * @return
      */
     public static boolean isDebugEnabled() {
-        return (printer.getSettings().getLogLevel() >= LogLevel.DEBUG);
+        return (printer.getSettings().getLogLevel() <= LogLevel.DEBUG);
     }
 
     /**
