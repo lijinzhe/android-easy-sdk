@@ -6,6 +6,7 @@ import rx.subjects.SerializedSubject;
 import rx.subjects.Subject;
 
 /**
+ * RxJava 实现事件总线
  * Created by Lee on 16/7/14.
  */
 public class RxBus {
@@ -18,5 +19,4 @@ public class RxBus {
     public static <T> Observable<T> toObserverable(Class<T> eventType) {
         return bus.ofType(eventType);
     }
-
 }
