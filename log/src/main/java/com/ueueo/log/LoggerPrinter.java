@@ -270,48 +270,41 @@ final class LoggerPrinter implements Printer {
         //get bytes of message with system's default charset (which is UTF-8 for Android)
         byte[] bytes = message.getBytes();
         int length = bytes.length;
-        if (length <= CHUNK_SIZE) {
-            if (methodCount > 0) {
-                logDivider(logType, tag);
-            }
-            String headerString = headerMessage.toString();
-            headerMessage.setLength(0);
-            if (!TextUtils.isEmpty(headerString)) {
-                String[] headers = headerString.split(HEADER_FOOTER_SEPARATOR);
-                for (String header : headers) {
-                    String[] lines = header.split(System.getProperty("line.separator"));
-                    for (String line : lines) {
-                        logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
-                    }
-                    logDivider(logType, tag);
-                }
-            }
-
-            logContent(logType, tag, message);
-
-            String footerString = footerMessage.toString();
-            footerMessage.setLength(0);
-            if (!TextUtils.isEmpty(footerString)) {
-                String[] footers = footerString.split(HEADER_FOOTER_SEPARATOR);
-                for (String footer : footers) {
-                    logDivider(logType, tag);
-                    String[] lines = footer.split(System.getProperty("line.separator"));
-                    for (String line : lines) {
-                        logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
-                    }
-                }
-            }
-
-            logBottomBorder(logType, tag);
-            return;
-        }
         if (methodCount > 0) {
             logDivider(logType, tag);
         }
-        for (int i = 0; i < length; i += CHUNK_SIZE) {
-            int count = Math.min(length - i, CHUNK_SIZE);
-            //create a new String with system's default charset (which is UTF-8 for Android)
-            logContent(logType, tag, new String(bytes, i, count));
+        String headerString = headerMessage.toString();
+        headerMessage.setLength(0);
+        if (!TextUtils.isEmpty(headerString)) {
+            String[] headers = headerString.split(HEADER_FOOTER_SEPARATOR);
+            for (String header : headers) {
+                String[] lines = header.split(System.getProperty("line.separator"));
+                for (String line : lines) {
+                    logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
+                }
+                logDivider(logType, tag);
+            }
+        }
+        if (length <= CHUNK_SIZE) {
+            logContent(logType, tag, message);
+        }else{
+            for (int i = 0; i < length; i += CHUNK_SIZE) {
+                int count = Math.min(length - i, CHUNK_SIZE);
+                //create a new String with system's default charset (which is UTF-8 for Android)
+                logContent(logType, tag, new String(bytes, i, count));
+            }
+        }
+        String footerString = footerMessage.toString();
+        footerMessage.setLength(0);
+        if (!TextUtils.isEmpty(footerString)) {
+            String[] footers = footerString.split(HEADER_FOOTER_SEPARATOR);
+            for (String footer : footers) {
+                logDivider(logType, tag);
+                String[] lines = footer.split(System.getProperty("line.separator"));
+                for (String line : lines) {
+                    logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
+                }
+            }
         }
         logBottomBorder(logType, tag);
     }
