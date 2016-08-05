@@ -61,42 +61,42 @@ public final class Logger {
         return printer.method(methodCount);
     }
 
-    public Printer header(String message, Object... args) {
+    public static Printer header(String message, Object... args) {
         printer.header(message, args);
         return printer;
     }
 
-    public Printer footer(String message, Object... args) {
+    public static Printer footer(String message, Object... args) {
         printer.footer(message, args);
         return printer;
     }
 
-    public Printer headerJson(String json) {
+    public static Printer headerJson(String json) {
         printer.headerJson(json);
         return printer;
     }
 
-    public Printer headerXml(String xml) {
+    public static Printer headerXml(String xml) {
         printer.headerXml(xml);
         return printer;
     }
 
-    public Printer headerObject(Object obj) {
+    public static Printer headerObject(Object obj) {
         printer.headerObject(obj);
         return printer;
     }
 
-    public Printer footerJson(String json) {
+    public static Printer footerJson(String json) {
         printer.footerJson(json);
         return printer;
     }
 
-    public Printer footerXml(String xml) {
+    public static Printer footerXml(String xml) {
         printer.footerXml(xml);
         return printer;
     }
 
-    public Printer footerObject(Object obj) {
+    public static Printer footerObject(Object obj) {
         printer.footerObject(obj);
         return printer;
     }
