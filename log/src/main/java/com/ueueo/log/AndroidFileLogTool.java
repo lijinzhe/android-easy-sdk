@@ -12,6 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * 可以将日志打印到文件中
+ */
 public class AndroidFileLogTool implements LogTool {
 
     // 日志文件保存的文件夹目录
@@ -19,6 +22,20 @@ public class AndroidFileLogTool implements LogTool {
 
     private static HashMap<String, File> mLogFiles = new HashMap<>();
 
+    /**
+     * 指定日志文件存储路径
+     *
+     * @param logDirPath
+     */
+    public AndroidFileLogTool(String logDirPath) {
+        LOG_DIR_PATH = logDirPath;
+    }
+
+    /**
+     * 日志文件存储路径为程序内的Log文件夹下
+     *
+     * @param context
+     */
     public AndroidFileLogTool(Context context) {
         LOG_DIR_PATH = context.getExternalFilesDir("LOG").getAbsolutePath();
     }
@@ -83,6 +100,7 @@ public class AndroidFileLogTool implements LogTool {
                 } catch (IOException e) {
                 }
             }
+            mLogFiles.put(tag, logFile);
         }
         BufferedWriter bufWriter = null;
         OutputStreamWriter out = null;
