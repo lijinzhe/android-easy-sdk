@@ -3,6 +3,8 @@ package com.ueueo.cache;
 import android.support.annotation.Nullable;
 import android.util.LruCache;
 
+import com.ueueo.cache.util.MemOccupyUtil;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -12,18 +14,18 @@ import java.util.Map;
 /**
  * Created by Lee on 16/7/28.
  */
-public class MemoryLruCache {
+public class UEMemLruCache {
 
     //使用1/8系统分配内存作为缓存上限
     private static final int MAX_CACHE_SIZE = (int) (Runtime.getRuntime().maxMemory() / 8);
     private LruCache<String, Object> mLruCache = null;
     private MemOccupyUtil memOccupyUtil = MemOccupyUtil.forSun32BitsVM();
 
-    public MemoryLruCache() {
+    public UEMemLruCache() {
         this(MAX_CACHE_SIZE);
     }
 
-    public MemoryLruCache(int maxSize) {
+    public UEMemLruCache(int maxSize) {
         mLruCache = new LruCache<String, Object>(maxSize) {
             @Override
             protected int sizeOf(String key, Object value) {

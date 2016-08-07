@@ -7,13 +7,13 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ import java.util.Map;
  * <p/>
  * SharedPreferences 存储数据
  */
-public class SharedPreferencesCache implements Cache {
+public class UESharedCache {
     /**
      * 默认存储文件名称
      */
@@ -33,14 +33,14 @@ public class SharedPreferencesCache implements Cache {
     private SharedPreferences mSP = null;
     private SharedPreferences.Editor mEditor = null;
 
-    private SharedPreferencesCache() {
+    private UESharedCache() {
     }
 
-    public SharedPreferencesCache(@Nullable Context context) {
+    public UESharedCache(@Nullable Context context) {
         this(context, DEFAULT_NAME);
     }
 
-    public SharedPreferencesCache(@Nullable Context context, @Nullable String name) {
+    public UESharedCache(@Nullable Context context, @Nullable String name) {
         if (context == null) {
             throw new RuntimeException("Context must not null!");
         }
@@ -57,7 +57,7 @@ public class SharedPreferencesCache implements Cache {
      * @param key   key不能为null，也不能为“”，否则存储失败
      * @param value 如果value等于null，则会清除当前key对应的数据，与remove(key)方法相同
      */
-    @Override
+
     public void putString(@Nullable String key, @Nullable String value) {
         this.putString(key, value, 0);
     }
@@ -69,7 +69,7 @@ public class SharedPreferencesCache implements Cache {
      * @param value     如果value等于null，则会清除当前key对应的数据，与remove(key)方法相同
      * @param expiresIn 有效时间，单位秒，当超出这个时间则会自动清除数据，如果expiresIn<=0则永久有效，只要手动删除数据
      */
-    @Override
+
     public void putString(@Nullable String key, @Nullable String value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -94,7 +94,7 @@ public class SharedPreferencesCache implements Cache {
      * @param defaultValue 当key对应的数据不存在时，返回defaultValue
      * @return 如果key对应数据存储在返回存储的数据，否则返回defaultValue
      */
-    @Override
+
     public String getString(@Nullable String key, String defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -112,12 +112,10 @@ public class SharedPreferencesCache implements Cache {
         }
     }
 
-    @Override
     public void putInt(@Nullable String key, int value) {
         this.putInt(key, value, 0);
     }
 
-    @Override
     public void putInt(@Nullable String key, int value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -131,7 +129,6 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
     public int getInt(@Nullable String key, int defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -149,12 +146,10 @@ public class SharedPreferencesCache implements Cache {
         }
     }
 
-    @Override
     public void putFloat(@Nullable String key, float value) {
         this.putFloat(key, value, 0);
     }
 
-    @Override
     public void putFloat(@Nullable String key, float value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -168,7 +163,6 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
     public float getFloat(@Nullable String key, float defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -186,12 +180,10 @@ public class SharedPreferencesCache implements Cache {
         }
     }
 
-    @Override
     public void putLong(@Nullable String key, long value) {
         this.putLong(key, value, 0);
     }
 
-    @Override
     public void putLong(@Nullable String key, long value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -205,7 +197,6 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
     public long getLong(@Nullable String key, long defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -223,12 +214,10 @@ public class SharedPreferencesCache implements Cache {
         }
     }
 
-    @Override
     public void putBoolean(@Nullable String key, boolean value) {
         this.putBoolean(key, value, 0);
     }
 
-    @Override
     public void putBoolean(@Nullable String key, boolean value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -242,7 +231,6 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
     public boolean getBoolean(@Nullable String key, boolean defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -260,12 +248,10 @@ public class SharedPreferencesCache implements Cache {
         }
     }
 
-    @Override
     public void putBytes(@Nullable String key, @Nullable byte[] value) {
         this.putBytes(key, value, 0);
     }
 
-    @Override
     public void putBytes(@Nullable String key, @Nullable byte[] value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -286,7 +272,6 @@ public class SharedPreferencesCache implements Cache {
         }
     }
 
-    @Override
     public byte[] getBytes(@Nullable String key, byte[] defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -317,12 +302,10 @@ public class SharedPreferencesCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putJSONObject(@Nullable String key, @Nullable JSONObject value) {
         this.putJSONObject(key, value, 0);
     }
 
-    @Override
     public void putJSONObject(@Nullable String key, @Nullable JSONObject value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -340,7 +323,6 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
     public JSONObject getJSONObject(@Nullable String key, JSONObject defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -371,12 +353,10 @@ public class SharedPreferencesCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putJSONArray(@Nullable String key, @Nullable JSONArray value) {
         this.putJSONArray(key, value, 0);
     }
 
-    @Override
     public void putJSONArray(@Nullable String key, @Nullable JSONArray value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -394,7 +374,6 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
     public JSONArray getJSONArray(@Nullable String key, JSONArray defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -425,12 +404,10 @@ public class SharedPreferencesCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putObject(@Nullable String key, @Nullable Object value) {
         this.putObject(key, value, 0);
     }
 
-    @Override
     public void putObject(@Nullable String key, @Nullable Object value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -448,7 +425,6 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
     public <T> T getObject(@Nullable String key, T defaultValue, Class<T> classOfT) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -468,12 +444,10 @@ public class SharedPreferencesCache implements Cache {
         }
     }
 
-    @Override
     public void putObjectArray(@Nullable String key, @Nullable List value) {
         this.putObjectArray(key, value, 0);
     }
 
-    @Override
     public void putObjectArray(@Nullable String key, @Nullable List value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -491,8 +465,7 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
-    public <T> List<T> getObjectArray(@Nullable String key, @Nullable List<T> defaultValue,Type type) {
+    public <T> List<T> getObjectArray(@Nullable String key, @Nullable List<T> defaultValue, TypeToken typeToken) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
         }
@@ -505,18 +478,16 @@ public class SharedPreferencesCache implements Cache {
         }
         String value = mSP.getString(key, null);
         if (value != null) {
-            return new Gson().fromJson(value, type);
+            return new Gson().fromJson(value, typeToken.getType());
         } else {
             return defaultValue;
         }
     }
 
-    @Override
     public void putObjectMap(@Nullable String key, @Nullable Map value) {
         this.putObjectMap(key, value, 0);
     }
 
-    @Override
     public void putObjectMap(@Nullable String key, @Nullable Map value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -535,8 +506,7 @@ public class SharedPreferencesCache implements Cache {
         mEditor.commit();
     }
 
-    @Override
-    public <K, V> Map<K, V> getObjectMap(@Nullable String key, @Nullable Map<K, V> defaultValue,Type type) {
+    public <K, V> Map<K, V> getObjectMap(@Nullable String key, @Nullable Map<K, V> defaultValue, TypeToken typeToken) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
         }
@@ -550,25 +520,22 @@ public class SharedPreferencesCache implements Cache {
         String value = mSP.getString(key, null);
         if (value != null) {
             Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-            return gson.fromJson(value, type);
+            return gson.fromJson(value, typeToken.getType());
         } else {
             return defaultValue;
         }
     }
 
-    @Override
     public void remove(@Nullable String key) {
         mEditor.remove(key);
         mEditor.remove(key + EXPIRES_IN_SUFFIX);
         mEditor.commit();
     }
 
-    @Override
     public void clear() {
         mEditor.clear().commit();
     }
 
-    @Override
     public boolean contains(@Nullable String key) {
         return mSP.contains(key);
     }

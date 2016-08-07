@@ -9,6 +9,8 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.ueueo.cache.util.DiskLruCache;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ import java.util.Map;
  * 当存储的文件大小超过最大字节数时，会删除优先级最低的文件，保存当前最新插入的数据
  * 推荐所有操作方法不要在主线程中调用，因为会操作文件，比较耗时
  */
-public class LocalDiskLruCache {
+public class UEDiskLruCache {
     /**
      * 默认存储文件夹名称
      */
@@ -46,7 +47,7 @@ public class LocalDiskLruCache {
 
     private DiskLruCache mDiskLruCache = null;
 
-    private LocalDiskLruCache() {
+    private UEDiskLruCache() {
 
     }
 
@@ -55,11 +56,11 @@ public class LocalDiskLruCache {
      *
      * @param context
      */
-    public LocalDiskLruCache(Context context) throws IOException {
+    public UEDiskLruCache(Context context) throws IOException {
         this(context, DEFAULT_NAME, DEFAULT_MAX_SIZE);
     }
 
-    public LocalDiskLruCache(@Nullable Context context, @Nullable String name) throws IOException {
+    public UEDiskLruCache(@Nullable Context context, @Nullable String name) throws IOException {
         this(context, name, DEFAULT_MAX_SIZE);
     }
 
@@ -68,7 +69,7 @@ public class LocalDiskLruCache {
      * @param name
      * @param maxSize 指定最大存储字节数，当存储的数据超出最大字节数时，会自动删除最老的数据，清理出空间用来存储最新数据
      */
-    public LocalDiskLruCache(@Nullable Context context, @Nullable String name, long maxSize) throws IOException {
+    public UEDiskLruCache(@Nullable Context context, @Nullable String name, long maxSize) throws IOException {
         if (TextUtils.isEmpty(name)) {
             throw new RuntimeException("Name must not null!");
         }
@@ -91,8 +92,8 @@ public class LocalDiskLruCache {
         mDiskLruCache = DiskLruCache.open(cacheFile, 1, 1, maxSize);
     }
 
-    public boolean putLong(String key, long value) {
-        return putString(key, String.valueOf(value));
+    public void putLong(String key, long value) {
+        putString(key, String.valueOf(value));
     }
 
     public long getLong(String key, long defaultValue) {
@@ -103,8 +104,32 @@ public class LocalDiskLruCache {
         }
     }
 
-    public boolean putInt(String key, int value) {
-        return putString(key, String.valueOf(value));
+    public void putBoolean(@Nullable String key, boolean value) {
+        putString(key, String.valueOf(value));
+    }
+
+    public boolean getBoolean(@Nullable String key, boolean defaultValue) {
+        try {
+            return Boolean.parseBoolean(getString(key, String.valueOf(defaultValue)));
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    public void putFloat(@Nullable String key, float value) {
+        putString(key, String.valueOf(value));
+    }
+
+    public float getFloat(@Nullable String key, float defaultValue) {
+        try {
+            return Float.parseFloat(getString(key, String.valueOf(defaultValue)));
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    public void putInt(String key, int value) {
+        putString(key, String.valueOf(value));
     }
 
     public int getInt(String key, int defaultValue) {
@@ -122,10 +147,12 @@ public class LocalDiskLruCache {
      * @param value
      * @return
      */
-    public boolean putString(@Nullable String key, @Nullable String value) {
+
+    public void putString(@Nullable String key, @Nullable String value) {
         if (mDiskLruCache != null && !TextUtils.isEmpty(key)) {
             if (value == null) {
-                return remove(key);
+                remove(key);
+                return;
             }
             OutputStream os = null;
             try {
@@ -134,7 +161,6 @@ public class LocalDiskLruCache {
                 os.write(value.getBytes());
                 editor.commit();
                 mDiskLruCache.flush();
-                return true;
             } catch (IOException e) {
             } finally {
                 if (os != null) {
@@ -146,7 +172,6 @@ public class LocalDiskLruCache {
                 }
             }
         }
-        return false;
     }
 
     /**
@@ -156,6 +181,7 @@ public class LocalDiskLruCache {
      * @param defaultValue 默认的返回值
      * @return 当key对应的存储数据不存在，或者key无效时，返回默认返回值defaultValue
      */
+
     public String getString(@Nullable String key, String defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -202,10 +228,11 @@ public class LocalDiskLruCache {
         return defaultValue;
     }
 
-    public boolean putBytes(@Nullable String key, @Nullable byte[] value) {
+    public void putBytes(@Nullable String key, @Nullable byte[] value) {
         if (mDiskLruCache != null && !TextUtils.isEmpty(key)) {
             if (value == null) {
-                return remove(key);
+                remove(key);
+                return;
             }
             OutputStream os = null;
             try {
@@ -214,7 +241,6 @@ public class LocalDiskLruCache {
                 os.write(value);
                 editor.commit();
                 mDiskLruCache.flush();
-                return true;
             } catch (IOException e) {
             } finally {
                 try {
@@ -226,7 +252,6 @@ public class LocalDiskLruCache {
                 }
             }
         }
-        return false;
     }
 
     public byte[] getBytes(@Nullable String key, byte[] defaultValue) {
@@ -270,10 +295,10 @@ public class LocalDiskLruCache {
         return defaultValue;
     }
 
-    public boolean putInputStream(@Nullable String key, @Nullable InputStream inputstream) {
+    public void putInputStream(@Nullable String key, @Nullable InputStream inputstream) {
         if (mDiskLruCache != null && !TextUtils.isEmpty(key)) {
             if (inputstream == null) {
-                return remove(key);
+                remove(key);
             }
             OutputStream os = null;
             try {
@@ -286,7 +311,6 @@ public class LocalDiskLruCache {
                 }
                 editor.commit();
                 mDiskLruCache.flush();
-                return true;
             } catch (IOException e) {
             } finally {
                 try {
@@ -304,7 +328,6 @@ public class LocalDiskLruCache {
                 }
             }
         }
-        return false;
     }
 
     /**
@@ -330,10 +353,10 @@ public class LocalDiskLruCache {
         return null;
     }
 
-    public boolean putBitmap(@Nullable String key, @Nullable Bitmap bitmap) {
+    public void putBitmap(@Nullable String key, @Nullable Bitmap bitmap) {
         if (mDiskLruCache != null && !TextUtils.isEmpty(key)) {
             if (bitmap == null) {
-                return remove(key);
+                remove(key);
             }
             OutputStream os = null;
             try {
@@ -342,7 +365,6 @@ public class LocalDiskLruCache {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
                 editor.commit();
                 mDiskLruCache.flush();
-                return true;
             } catch (IOException e) {
             } finally {
                 try {
@@ -354,7 +376,6 @@ public class LocalDiskLruCache {
                 }
             }
         }
-        return false;
     }
 
     public Bitmap getBitmap(@Nullable String key) {
@@ -380,11 +401,12 @@ public class LocalDiskLruCache {
         return null;
     }
 
-    public boolean putObject(@Nullable String key, @Nullable Object value) {
+    public void putObject(@Nullable String key, @Nullable Object value) {
         if (value == null) {
-            return remove(key);
+            remove(key);
+            return;
         }
-        return putString(key, new Gson().toJson(value));
+        putString(key, new Gson().toJson(value));
     }
 
     public <T> T getObject(@Nullable String key, T defaultValue, Class<T> classOfT) {
@@ -399,51 +421,54 @@ public class LocalDiskLruCache {
         }
     }
 
-    public boolean putObjectArray(@Nullable String key, @Nullable List value) {
+    public void putObjectArray(@Nullable String key, @Nullable List value) {
         if (value == null) {
-            return remove(key);
+            remove(key);
+            return;
         }
-        return putString(key, new Gson().toJson(value));
+        putString(key, new Gson().toJson(value));
     }
 
-    public <T> List<T> getObjectArray(@Nullable String key, @Nullable List<T> defaultValue,Type type) {
+    public <T> List<T> getObjectArray(@Nullable String key, @Nullable List<T> defaultValue, TypeToken typeToken) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
         }
         String value = getString(key, null);
         if (value != null) {
-            return new Gson().fromJson(value, type);
+            return new Gson().fromJson(value, typeToken.getType());
         } else {
             return defaultValue;
         }
     }
 
-    public boolean putObjectMap(@Nullable String key, @Nullable Map<String, Object> value) {
+    public void putObjectMap(@Nullable String key, @Nullable Map value) {
         if (value == null) {
-            return remove(key);
+            remove(key);
+            return;
         }
         Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-        return putString(key, gson.toJson(value));
+        putString(key, gson.toJson(value));
     }
 
-    public <K, V> Map<K, V> getObjectMap(@Nullable String key, @Nullable Map<K, V> defaultValue,Type type) {
+    public <K, V> Map<K, V> getObjectMap(@Nullable String key, @Nullable Map<K, V> defaultValue, TypeToken typeToken) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
         }
         String value = getString(key, null);
         if (value != null) {
             Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-            return gson.fromJson(value, type);
+            return gson.fromJson(value, typeToken.getType());
         } else {
             return defaultValue;
         }
     }
 
-    public boolean putJSONObject(@Nullable String key, @Nullable JSONObject value) {
+    public void putJSONObject(@Nullable String key, @Nullable JSONObject value) {
         if (value == null) {
-            return remove(key);
+            remove(key);
+            return;
         }
-        return putString(key, value.toString());
+        putString(key, value.toString());
     }
 
     public JSONObject getJSONObject(@Nullable String key, JSONObject defaultValue) {
@@ -460,11 +485,12 @@ public class LocalDiskLruCache {
         return defaultValue;
     }
 
-    public boolean putJSONArray(@Nullable String key, @Nullable JSONArray value) {
+    public void putJSONArray(@Nullable String key, @Nullable JSONArray value) {
         if (value == null) {
-            return remove(key);
+            remove(key);
+            return;
         }
-        return putString(key, value.toString());
+        putString(key, value.toString());
     }
 
     public JSONArray getJSONArray(@Nullable String key, JSONArray defaultValue) {
@@ -481,24 +507,25 @@ public class LocalDiskLruCache {
         return defaultValue;
     }
 
-    public boolean remove(@Nullable String key) {
+    public boolean contains(@Nullable String key) {
+        return getString(key, null) != null;
+    }
+
+    public void remove(@Nullable String key) {
         if (mDiskLruCache != null && !TextUtils.isEmpty(key)) {
             try {
-                return mDiskLruCache.remove(key);
+                mDiskLruCache.remove(key);
             } catch (IOException e) {
             }
         }
-        return false;
     }
 
-    public boolean clear() {
+    public void clear() {
         if (mDiskLruCache != null) {
             try {
                 mDiskLruCache.delete();
-                return true;
             } catch (IOException e) {
             }
         }
-        return false;
     }
 }

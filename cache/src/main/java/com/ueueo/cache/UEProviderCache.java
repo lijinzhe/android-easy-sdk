@@ -9,20 +9,21 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.ueueo.cache.util.CacheProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by Lee on 16/7/11.
  */
-public class ContentProviderCache implements Cache {
+public class UEProviderCache {
 
     private static final String DEFAULT_NAME = "default";
 
@@ -30,24 +31,22 @@ public class ContentProviderCache implements Cache {
 
     private Application mApplication = null;
 
-    private ContentProviderCache() {
+    private UEProviderCache() {
     }
 
-    public ContentProviderCache(@Nullable Application application) {
+    public UEProviderCache(@Nullable Application application) {
         this(application, DEFAULT_NAME);
     }
 
-    public ContentProviderCache(@Nullable Application application, @Nullable String name) {
+    public UEProviderCache(@Nullable Application application, @Nullable String name) {
         this.mApplication = application;
         this.mSchemaName = name;
     }
 
-    @Override
     public void putString(@Nullable String key, @Nullable String value) {
         putString(key, value, 0);
     }
 
-    @Override
     public void putString(@Nullable String key, @Nullable String value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -67,7 +66,6 @@ public class ContentProviderCache implements Cache {
         }
     }
 
-    @Override
     public String getString(@Nullable String key, String defaultValue) {
         if (TextUtils.isEmpty(key)) {
             return defaultValue;
@@ -86,17 +84,14 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putInt(@Nullable String key, int value) {
         putInt(key, value, 0);
     }
 
-    @Override
     public void putInt(@Nullable String key, int value, long expiresIn) {
         putString(key, String.valueOf(value), expiresIn);
     }
 
-    @Override
     public int getInt(@Nullable String key, int defaultValue) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
@@ -108,17 +103,14 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putFloat(@Nullable String key, float value) {
         putFloat(key, value, 0);
     }
 
-    @Override
     public void putFloat(@Nullable String key, float value, long expiresIn) {
         putString(key, String.valueOf(value), expiresIn);
     }
 
-    @Override
     public float getFloat(@Nullable String key, float defaultValue) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
@@ -130,17 +122,14 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putLong(@Nullable String key, long value) {
         putLong(key, value, 0);
     }
 
-    @Override
     public void putLong(@Nullable String key, long value, long expiresIn) {
         putString(key, String.valueOf(value), expiresIn);
     }
 
-    @Override
     public long getLong(@Nullable String key, long defaultValue) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
@@ -152,17 +141,14 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putBoolean(@Nullable String key, boolean value) {
         putBoolean(key, value, 0);
     }
 
-    @Override
     public void putBoolean(@Nullable String key, boolean value, long expiresIn) {
         putString(key, String.valueOf(value), expiresIn);
     }
 
-    @Override
     public boolean getBoolean(@Nullable String key, boolean defaultValue) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
@@ -171,12 +157,10 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putBytes(@Nullable String key, @Nullable byte[] value) {
         putBytes(key, value, 0);
     }
 
-    @Override
     public void putBytes(@Nullable String key, @Nullable byte[] value, long expiresIn) {
         if (TextUtils.isEmpty(key)) {
             return;
@@ -191,7 +175,6 @@ public class ContentProviderCache implements Cache {
         }
     }
 
-    @Override
     public byte[] getBytes(@Nullable String key, byte[] defaultValue) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
@@ -203,12 +186,10 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putJSONObject(@Nullable String key, @Nullable JSONObject value) {
         putJSONObject(key, value, 0);
     }
 
-    @Override
     public void putJSONObject(@Nullable String key, @Nullable JSONObject value, long expiresIn) {
         if (value != null) {
             putString(key, value.toString(), expiresIn);
@@ -217,7 +198,6 @@ public class ContentProviderCache implements Cache {
         }
     }
 
-    @Override
     public JSONObject getJSONObject(@Nullable String key, JSONObject defaultValue) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
@@ -229,12 +209,10 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putJSONArray(@Nullable String key, @Nullable JSONArray value) {
         putJSONArray(key, value, 0);
     }
 
-    @Override
     public void putJSONArray(@Nullable String key, @Nullable JSONArray value, long expiresIn) {
         if (value != null) {
             putString(key, value.toString(), expiresIn);
@@ -243,7 +221,6 @@ public class ContentProviderCache implements Cache {
         }
     }
 
-    @Override
     public JSONArray getJSONArray(@Nullable String key, JSONArray defaultValue) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
@@ -255,12 +232,10 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putObject(@Nullable String key, @Nullable Object value) {
         putObject(key, value, 0);
     }
 
-    @Override
     public void putObject(@Nullable String key, @Nullable Object value, long expiresIn) {
         if (value != null) {
             putString(key, new Gson().toJson(value), expiresIn);
@@ -269,7 +244,6 @@ public class ContentProviderCache implements Cache {
         }
     }
 
-    @Override
     public <T> T getObject(@Nullable String key, T defaultValue, Class<T> classOfT) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
@@ -278,12 +252,10 @@ public class ContentProviderCache implements Cache {
         return defaultValue;
     }
 
-    @Override
     public void putObjectArray(@Nullable String key, @Nullable List value) {
         putObjectArray(key, value, 0);
     }
 
-    @Override
     public void putObjectArray(@Nullable String key, @Nullable List value, long expiresIn) {
         if (value != null) {
             putString(key, new Gson().toJson(value), expiresIn);
@@ -292,21 +264,18 @@ public class ContentProviderCache implements Cache {
         }
     }
 
-    @Override
-    public <T> List<T> getObjectArray(@Nullable String key, @Nullable List<T> defaultValue,Type type) {
+    public <T> List<T> getObjectArray(@Nullable String key, @Nullable List<T> defaultValue, TypeToken typeToken) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
-            return new Gson().fromJson(value, type);
+            return new Gson().fromJson(value, typeToken.getType());
         }
         return defaultValue;
     }
 
-    @Override
     public void putObjectMap(@Nullable String key, @Nullable Map value) {
         putObjectMap(key, value, 0);
     }
 
-    @Override
     public void putObjectMap(@Nullable String key, @Nullable Map value, long expiresIn) {
         if (value != null) {
             Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
@@ -316,27 +285,23 @@ public class ContentProviderCache implements Cache {
         }
     }
 
-    @Override
-    public <K, V> Map<K, V> getObjectMap(@Nullable String key, @Nullable Map<K, V> defaultValue,Type type) {
+    public <K, V> Map<K, V> getObjectMap(@Nullable String key, @Nullable Map<K, V> defaultValue, TypeToken typeToken) {
         String value = getString(key, null);
         if (!TextUtils.isEmpty(value)) {
             Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
-            return gson.fromJson(value, type);
+            return gson.fromJson(value, typeToken.getType());
         }
         return defaultValue;
     }
 
-    @Override
     public void remove(@Nullable String key) {
         mApplication.getContentResolver().delete(CacheProvider.URI, "schema = ? and key = ?", new String[]{mSchemaName, key});
     }
 
-    @Override
     public void clear() {
         mApplication.getContentResolver().delete(CacheProvider.URI, "schema = ?", new String[]{mSchemaName});
     }
 
-    @Override
     public boolean contains(@Nullable String key) {
         if (TextUtils.isEmpty(key)) {
             return false;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ueueo.cache;
+package com.ueueo.cache.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;

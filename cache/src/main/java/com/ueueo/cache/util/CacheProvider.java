@@ -1,4 +1,4 @@
-package com.ueueo.cache;
+package com.ueueo.cache.util;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
