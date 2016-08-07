@@ -7,7 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 @TargetApi(Build.VERSION_CODES.M)
-public class ShadowActivity extends Activity {
+public class PermissionActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

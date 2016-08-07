@@ -98,6 +98,43 @@ public class RxPermission {
         return Observable.just(null).compose(ensureEach(context, permissions));
     }
 
+    /**
+     * Invokes Activity.shouldShowRequestPermissionRationale and wraps
+     * the returned value in an observable.
+     * <p/>
+     * In case of multiple permissions, only emits true if
+     * Activity.shouldShowRequestPermissionRationale returned true for
+     * all revoked permissions.
+     * <p/>
+     * You shouldn't call this method if all permissions have been granted.
+     * <p/>
+     * For SDK &lt; 23, the observable will always emit false.
+     */
+    public static Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity, final Permission... permissions) {
+        if (!isMarshmallow()) {
+            return Observable.just(false);
+        }
+        return Observable.just(shouldShowRequestPermissionRationale_(activity, permissions));
+    }
+
+    /**
+     * Returns true if the permission is already granted.
+     * <p/>
+     * Always true if SDK &lt; 23.
+     */
+    public static boolean isGranted(Context context, Permission permission) {
+        return !isMarshmallow() || isGranted_(context, permission);
+    }
+
+    /**
+     * Returns true if the permission has been revoked by a policy.
+     * <p/>
+     * Always false if SDK &lt; 23.
+     */
+    public static boolean isRevoked(Context context, Permission permission) {
+        return isMarshmallow() && isRevoked_(context, permission);
+    }
+
     private static Observable<Permission> request(final Context context, final Observable<?> trigger, final Permission... permissions) {
         if (permissions == null || permissions.length == 0) {
             throw new IllegalArgumentException("RxPermissions.request/requestEach requires at least one input permission");
@@ -167,26 +204,6 @@ public class RxPermission {
         return Observable.concat(Observable.from(list));
     }
 
-    /**
-     * Invokes Activity.shouldShowRequestPermissionRationale and wraps
-     * the returned value in an observable.
-     * <p/>
-     * In case of multiple permissions, only emits true if
-     * Activity.shouldShowRequestPermissionRationale returned true for
-     * all revoked permissions.
-     * <p/>
-     * You shouldn't call this method if all permissions have been granted.
-     * <p/>
-     * For SDK &lt; 23, the observable will always emit false.
-     */
-    public static Observable<Boolean> shouldShowRequestPermissionRationale(final Activity activity,
-                                                                           final Permission... permissions) {
-        if (!isMarshmallow()) {
-            return Observable.just(false);
-        }
-        return Observable.just(shouldShowRequestPermissionRationale_(activity, permissions));
-    }
-
     @TargetApi(Build.VERSION_CODES.M)
     private static boolean shouldShowRequestPermissionRationale_(final Activity activity,
                                                                  final Permission... permissions) {
@@ -198,33 +215,15 @@ public class RxPermission {
         return true;
     }
 
-    static void startShadowActivity(Context context, String[] permissions) {
+    private static void startShadowActivity(Context context, String[] permissions) {
         log("startShadowActivity " + TextUtils.join(", ", permissions));
-        Intent intent = new Intent(context, ShadowActivity.class);
+        Intent intent = new Intent(context, PermissionActivity.class);
         intent.putExtra("permissions", permissions);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
-    /**
-     * Returns true if the permission is already granted.
-     * <p/>
-     * Always true if SDK &lt; 23.
-     */
-    public static boolean isGranted(Context context, Permission permission) {
-        return !isMarshmallow() || isGranted_(context, permission);
-    }
-
-    /**
-     * Returns true if the permission has been revoked by a policy.
-     * <p/>
-     * Always false if SDK &lt; 23.
-     */
-    public static boolean isRevoked(Context context, Permission permission) {
-        return isMarshmallow() && isRevoked_(context, permission);
-    }
-
-    static boolean isMarshmallow() {
+    private static boolean isMarshmallow() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
