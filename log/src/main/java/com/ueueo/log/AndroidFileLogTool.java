@@ -86,13 +86,14 @@ public class AndroidFileLogTool implements LogTool {
     private synchronized void writeToFile(int priority, String tag, String msg) {
         File logFile = mLogFiles.get(tag);
         if (logFile == null) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Date date = new Date(System.currentTimeMillis());
-            String fileName = format.format(date) + ".log";
             File logDir = new File(LOG_DIR_PATH, tag);
             if (!logDir.exists()) {
                 logDir.mkdirs();
             }
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            Date date = new Date(System.currentTimeMillis());
+            String fileName = format.format(date) + ".log";
             logFile = new File(logDir, fileName);
             if (!logFile.exists()) {
                 try {
