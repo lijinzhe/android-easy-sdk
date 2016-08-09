@@ -1,40 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!--
-      Base application theme, dependent on API level. This theme is replaced
-      by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
-        <!--
-          Theme customizations available in newer API levels can go in
-          res/values-vXX/styles.xml, while customizations related to
-          backward-compatibility can go here.
-        -->
-    </style>
-
-    <!--  这个是加入的代码 -->
-    <style name="popupwindow_anim_style">
-        <item name="android:windowEnterAnimation">@anim/show_from_bottom</item>
-        <!-- 指定显示的动画xml -->
-        <item name="android:windowExitAnimation">@anim/hide2bottom</item>
-        <!-- 指定消失的动画xml -->
-    </style>
-
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">#cc22292c</item>
-        <item name="colorPrimaryDark">#cc22292c</item>
-    </style>
-
-    <style name="Transparent" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">#cc22292c</item>
-        <item name="colorPrimaryDark">#dd22292c</item>
-        <item name="android:windowBackground">@color/white</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
-    </style>
+    <style name="MIS_NO_ACTIONBAR" parent="Theme.AppCompat.Light.NoActionBar"></style>
 
 </resources>

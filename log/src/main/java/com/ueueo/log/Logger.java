@@ -1,5 +1,11 @@
 package com.ueueo.log;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.telephony.TelephonyManager;
+
 /**
  * Logger is a wrapper of {@link android.util.Log}
  * But more pretty, simple and powerful
@@ -154,5 +160,56 @@ public final class Logger {
      */
     public static void object(Object obj) {
         printer.object(obj);
+    }
+
+    /**
+     * 打印手机状态信息
+     * <p>需添加权限<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+     */
+    public static void printPhoneInfo(Context context) {
+        if (context == null) {
+            throw new RuntimeException("context must not null");
+        }
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (context.getPackageManager().checkPermission(Manifest.permission.READ_PHONE_STATE, context.getPackageName()) != PackageManager.PERMISSION_GRANTED) {
+                d("Must have permission 'android.permission.READ_PHONE_STATE'");
+                return;
+            }
+        } else {
+            if (context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                d("Must have permission 'android.permission.READ_PHONE_STATE'");
+                return;
+            }
+        }
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("DeviceId(IMEI) = ").append(tm.getDeviceId()).append("\n");
+        stringBuilder.append("DeviceSoftwareVersion = ").append(tm.getDeviceSoftwareVersion()).append("\n");
+        stringBuilder.append("Line1Number = ").append(tm.getLine1Number()).append("\n");
+        stringBuilder.append("NetworkCountryIso = ").append(tm.getNetworkCountryIso()).append("\n");
+        stringBuilder.append("NetworkOperator = ").append(tm.getNetworkOperator()).append("\n");
+        stringBuilder.append("NetworkOperatorName = ").append(tm.getNetworkOperatorName()).append("\n");
+        stringBuilder.append("NetworkType = ").append(tm.getNetworkType()).append("\n");
+        stringBuilder.append("honeType = ").append(tm.getPhoneType()).append("\n");
+        stringBuilder.append("SimCountryIso = ").append(tm.getSimCountryIso()).append("\n");
+        stringBuilder.append("SimOperator = ").append(tm.getSimOperator()).append("\n");
+        stringBuilder.append("SimOperatorName = ").append(tm.getSimOperatorName()).append("\n");
+        stringBuilder.append("SimSerialNumber = ").append(tm.getSimSerialNumber()).append("\n");
+        stringBuilder.append("SimState = ").append(tm.getSimState()).append("\n");
+        stringBuilder.append("SubscriberId(IMSI) = ").append(tm.getSubscriberId()).append("\n");
+        stringBuilder.append("VoiceMailNumber = ").append(tm.getVoiceMailNumber()).append("\n");
+        d(stringBuilder.toString());
+    }
+
+    public static void printStorageInfo(Context context) {
+
+    }
+
+    public static void printMemoryInfo(Context context) {
+
+    }
+
+    public static void printNetworkInfo(Context context) {
+
     }
 }
