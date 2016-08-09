@@ -25,6 +25,9 @@ public class NetworkUtil {
      * @param context
      */
     public static void openWiFiSetting(Context context) {
+        if (context == null) {
+            throw new RuntimeException("context must not null");
+        }
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             //3.0以下打开设置界面
             context.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
@@ -39,6 +42,9 @@ public class NetworkUtil {
      * @param context
      */
     public static void openNetworkSetting(Context context) {
+        if (context == null) {
+            throw new RuntimeException("context must not null");
+        }
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             context.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
         } else {
