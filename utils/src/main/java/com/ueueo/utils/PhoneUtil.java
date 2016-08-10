@@ -5,18 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.SystemClock;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
-import android.util.Xml;
 
-import org.xmlpull.v1.XmlSerializer;
-
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,6 +21,9 @@ public class PhoneUtil {
 
     /**
      * 判断设备是否是手机
+     * <p/>
+     * 需添加权限
+     * <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
      */
     public static boolean isPhone(Context context) {
         if (context == null) {
@@ -38,38 +35,50 @@ public class PhoneUtil {
 
     /**
      * 获取当前设备的IMIE
-     * <p>需与上面的isPhone一起使用
-     * <p>需添加权限<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+     * <p/>
+     * 需添加权限
+     * <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
      */
     public static String getIMEI(Context context) {
         if (context == null) {
             throw new RuntimeException("context must not null");
         }
-        String deviceId = null;
-        if (isPhone(context)) {
-            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            deviceId = tm.getDeviceId();
-        }
-        return deviceId;
+        TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        return tm.getDeviceId();
     }
 
     /**
-     * 跳至填充好phoneNumber的拨号界面
+     * 跳转至拨号界面
+     *
+     * @param context
+     * @param phoneNumber 默认的电话号码
      */
     public static void dial(Context context, String phoneNumber) {
         context.startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phoneNumber)));
     }
 
     /**
-     * 拨打phoneNumber
-     * <p>需添加权限<uses-permission android:name="android.permission.CALL_PHONE"/>
+     * 直接拨打电话
+     * <p/>
+     * 需添加权限
+     * <uses-permission android:name="android.permission.CALL_PHONE"/>
+     *
+     * @param context
+     * @param phoneNumber 电话号码
      */
     public static void call(Context context, String phoneNumber) {
-        context.startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + phoneNumber)));
+        if (context == null) {
+            throw new RuntimeException("context must not null");
+        }
+        if (!TextUtils.isEmpty(phoneNumber)) {
+            context.startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + phoneNumber)));
+        }
     }
 
     /**
      * 发送短信
+     * <p/>
+     * 打开短信编辑界面
      */
     public static void sendSms(Context context, String phoneNumber, String content) {
         if (context == null) {
@@ -83,15 +92,16 @@ public class PhoneUtil {
 
     /**
      * 获取手机联系人
-     * <p>需添加权限<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-     * <p>需添加权限<uses-permission android:name="android.permission.READ_CONTACTS" />
+     * <p/>
+     * 需添加权限
+     * <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+     * <uses-permission android:name="android.permission.READ_CONTACTS" />
      */
-    public static List<HashMap<String, String>> getAllContactInfo(Context context) {
+    public static List<Contact> getAllContacts(Context context) {
         if (context == null) {
             throw new RuntimeException("context must not null");
         }
-        SystemClock.sleep(3000);
-        ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+        ArrayList<Contact> list = new ArrayList<>();
         // 1.获取内容解析者
         ContentResolver resolver = context.getContentResolver();
         // 2.获取内容提供者的地址:com.android.contacts
@@ -102,8 +112,8 @@ public class PhoneUtil {
         Uri date_uri = Uri.parse("content://com.android.contacts/data");
         // 4.查询操作,先查询raw_contacts,查询contact_id
         // projection : 查询的字段
-        Cursor cursor = resolver.query(raw_uri, new String[]{"contact_id"},
-                null, null, null);
+        Cursor cursor = resolver.query(raw_uri, new String[]{"contact_id"}, null, null, null);
+        Contact contact = null;
         // 5.解析cursor
         while (cursor.moveToNext()) {
             // 6.获取查询的数据
@@ -117,11 +127,9 @@ public class PhoneUtil {
                 // selectionArgs :查询条件的参数
                 // sortOrder : 排序
                 // 空指针: 1.null.方法 2.参数为null
-                Cursor c = resolver.query(date_uri, new String[]{"data1",
-                                "mimetype"}, "raw_contact_id=?",
-                        new String[]{contact_id}, null);
-                HashMap<String, String> map = new HashMap<String, String>();
+                Cursor c = resolver.query(date_uri, new String[]{"data1", "mimetype"}, "raw_contact_id=?", new String[]{contact_id}, null);
                 // 8.解析c
+                contact = new Contact();
                 while (c.moveToNext()) {
                     // 9.获取数据
                     String data1 = c.getString(0);
@@ -129,14 +137,14 @@ public class PhoneUtil {
                     // 10.根据类型去判断获取的data1数据并保存
                     if (mimetype.equals("vnd.android.cursor.item/phone_v2")) {
                         // 电话
-                        map.put("phone", data1);
+                        contact.phone = data1;
                     } else if (mimetype.equals("vnd.android.cursor.item/name")) {
                         // 姓名
-                        map.put("name", data1);
+                        contact.name = data1;
                     }
                 }
                 // 11.添加到集合中数据
-                list.add(map);
+                list.add(contact);
                 // 12.关闭cursor
                 c.close();
             }
@@ -147,103 +155,114 @@ public class PhoneUtil {
     }
 
     /**
-     * 打开手机联系人界面点击联系人后便获取该号码
-     * <p>参照以下注释代码
+     * 获取手机短信
+     * <p/>
+     * 需添加权限
+     * <uses-permission android:name="android.permission.READ_SMS"/>
      */
-    public static void getContantNum() {
-        Log.i("tips", "U should copy the following code.");
-        /*
-        Intent intent = new Intent();
-        intent.setAction("android.intent.action.PICK");
-        intent.setType("vnd.android.cursor.dir/phone_v2");
-        startActivityForResult(intent, 0);
-
-        @Override
-        protected void onActivityResult ( int requestCode, int resultCode, Intent data){
-            super.onActivityResult(requestCode, resultCode, data);
-            if (data != null) {
-                Uri uri = data.getData();
-                String num = null;
-                // 创建内容解析者
-                ContentResolver contentResolver = getContentResolver();
-                Cursor cursor = contentResolver.query(uri,
-                        null, null, null, null);
-                while (cursor.moveToNext()) {
-                    num = cursor.getString(cursor.getColumnIndex("data1"));
-                }
-                cursor.close();
-                num = num.replaceAll("-", "");//替换的操作,555-6 -> 5556
+    public static List<Message> getAllMessages(Context context) {
+        List<Message> messages = new ArrayList<>();
+        ContentResolver resolver = context.getContentResolver();
+        Uri uri = Uri.parse("content://sms");
+        Cursor cursor = resolver.query(uri, new String[]{"address", "date", "type", "body"}, null, null, null);
+        int count = cursor.getCount();//获取短信的个数
+        try {
+            Message message = null;
+            while (cursor.moveToNext()) {
+                message = new Message();
+                message.address = cursor.getString(0);
+                message.date = cursor.getString(1);
+                message.type = cursor.getString(2);
+                message.body = cursor.getString(3);
+                messages.add(message);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            cursor.close();
         }
-        */
+        return messages;
     }
 
     /**
-     * 获取手机短信并保存到xml中
-     * <p>需添加权限<uses-permission android:name="android.permission.READ_SMS"/>
-     * <p>需添加权限<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+     * 联系人
      */
-    public static void getAllSMS(Context context) {
-        //1.获取短信
-        //1.1获取内容解析者
-        ContentResolver resolver = context.getContentResolver();
-        //1.2获取内容提供者地址   sms,sms表的地址:null  不写
-        //1.3获取查询路径
-        Uri uri = Uri.parse("content://sms");
-        //1.4.查询操作
-        //projection : 查询的字段
-        //selection : 查询的条件
-        //selectionArgs : 查询条件的参数
-        //sortOrder : 排序
-        Cursor cursor = resolver.query(uri, new String[]{"address", "date", "type", "body"}, null, null, null);
-        //设置最大进度
-        int count = cursor.getCount();//获取短信的个数
-        //2.备份短信
-        //2.1获取xml序列器
-        XmlSerializer xmlSerializer = Xml.newSerializer();
-        try {
-            //2.2设置xml文件保存的路径
-            //os : 保存的位置
-            //encoding : 编码格式
-            xmlSerializer.setOutput(new FileOutputStream(new File("/mnt/sdcard/backupsms.xml")), "utf-8");
-            //2.3设置头信息
-            //standalone : 是否独立保存
-            xmlSerializer.startDocument("utf-8", true);
-            //2.4设置根标签
-            xmlSerializer.startTag(null, "smss");
-            //1.5.解析cursor
-            while (cursor.moveToNext()) {
-                SystemClock.sleep(1000);
-                //2.5设置短信的标签
-                xmlSerializer.startTag(null, "sms");
-                //2.6设置文本内容的标签
-                xmlSerializer.startTag(null, "address");
-                String address = cursor.getString(0);
-                //2.7设置文本内容
-                xmlSerializer.text(address);
-                xmlSerializer.endTag(null, "address");
-                xmlSerializer.startTag(null, "date");
-                String date = cursor.getString(1);
-                xmlSerializer.text(date);
-                xmlSerializer.endTag(null, "date");
-                xmlSerializer.startTag(null, "type");
-                String type = cursor.getString(2);
-                xmlSerializer.text(type);
-                xmlSerializer.endTag(null, "type");
-                xmlSerializer.startTag(null, "body");
-                String body = cursor.getString(3);
-                xmlSerializer.text(body);
-                xmlSerializer.endTag(null, "body");
-                xmlSerializer.endTag(null, "sms");
-                System.out.println("address:" + address + "   date:" + date + "  type:" + type + "  body:" + body);
+    public static class Contact implements Parcelable {
+        public static final Parcelable.Creator<Contact> CREATOR = new Parcelable.Creator<Contact>() {
+            @Override
+            public Contact createFromParcel(Parcel source) {
+                return new Contact(source);
             }
-            xmlSerializer.endTag(null, "smss");
-            xmlSerializer.endDocument();
-            //2.8将数据刷新到文件中
-            xmlSerializer.flush();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+            @Override
+            public Contact[] newArray(int size) {
+                return new Contact[size];
+            }
+        };
+        public String name;
+        public String phone;
+
+        public Contact() {
+        }
+
+        protected Contact(Parcel in) {
+            this.name = in.readString();
+            this.phone = in.readString();
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(this.name);
+            dest.writeString(this.phone);
+        }
+    }
+
+    /**
+     * 短信
+     */
+    public static class Message implements Parcelable {
+        public static final Parcelable.Creator<Message> CREATOR = new Parcelable.Creator<Message>() {
+            @Override
+            public Message createFromParcel(Parcel source) {
+                return new Message(source);
+            }
+
+            @Override
+            public Message[] newArray(int size) {
+                return new Message[size];
+            }
+        };
+        public String address;
+        public String date;
+        public String type;
+        public String body;
+
+        public Message() {
+        }
+
+        protected Message(Parcel in) {
+            this.address = in.readString();
+            this.date = in.readString();
+            this.type = in.readString();
+            this.body = in.readString();
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(this.address);
+            dest.writeString(this.date);
+            dest.writeString(this.type);
+            dest.writeString(this.body);
         }
     }
 }
