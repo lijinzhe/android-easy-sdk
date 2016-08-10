@@ -1,1 +1,1 @@
-include ':sample', ':log', ':photopicker', ':rxpermission', ':cache', ':greendao', ':rxbus', ':bitmap', ':utils', ':apk'
+include ':sample', ':log', ':photopicker', ':rxpermission', ':cache', ':greendao', ':rxbus', ':bitmap', ':utils', ':apk', ':phone'

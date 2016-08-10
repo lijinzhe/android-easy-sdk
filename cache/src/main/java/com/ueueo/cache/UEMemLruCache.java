@@ -35,7 +35,11 @@ public class UEMemLruCache {
     }
 
     public void putString(@Nullable String key, @Nullable String value) {
-        mLruCache.put(key, value);
+        if (value != null) {
+            mLruCache.put(key, value);
+        } else {
+            mLruCache.remove(key);
+        }
     }
 
     public String getString(@Nullable String key, String defaultValue) {
@@ -100,7 +104,11 @@ public class UEMemLruCache {
     }
 
     public void putBytes(@Nullable String key, @Nullable byte[] value) {
-        mLruCache.put(key, value);
+        if (value != null) {
+            mLruCache.put(key, value);
+        } else {
+            mLruCache.remove(key);
+        }
     }
 
     public byte[] getBytes(@Nullable String key, byte[] defaultValue) {
@@ -113,7 +121,11 @@ public class UEMemLruCache {
     }
 
     public void putJSONObject(@Nullable String key, @Nullable JSONObject value) {
-        mLruCache.put(key, value);
+        if (value != null) {
+            mLruCache.put(key, value);
+        } else {
+            mLruCache.remove(key);
+        }
     }
 
     public JSONObject getJSONObject(@Nullable String key, JSONObject defaultValue) {
@@ -126,7 +138,11 @@ public class UEMemLruCache {
     }
 
     public void putJSONArray(@Nullable String key, @Nullable JSONArray value) {
-        mLruCache.put(key, value);
+        if (value != null) {
+            mLruCache.put(key, value);
+        } else {
+            mLruCache.remove(key);
+        }
     }
 
     public JSONArray getJSONArray(@Nullable String key, JSONArray defaultValue) {
@@ -139,7 +155,11 @@ public class UEMemLruCache {
     }
 
     public void putObject(@Nullable String key, @Nullable Object value) {
-        mLruCache.put(key, value);
+        if (value != null) {
+            mLruCache.put(key, value);
+        } else {
+            mLruCache.remove(key);
+        }
     }
 
     public <T> T getObject(@Nullable String key, T defaultValue) {
@@ -152,7 +172,11 @@ public class UEMemLruCache {
     }
 
     public void putObjectArray(@Nullable String key, @Nullable List value) {
-        mLruCache.put(key, value);
+        if (value != null) {
+            mLruCache.put(key, value);
+        } else {
+            mLruCache.remove(key);
+        }
     }
 
     public <T> List<T> getObjectArray(@Nullable String key, @Nullable List<T> defaultValue) {
@@ -165,7 +189,11 @@ public class UEMemLruCache {
     }
 
     public void putObjectMap(@Nullable String key, @Nullable Map value) {
-        mLruCache.put(key, value);
+        if (value != null) {
+            mLruCache.put(key, value);
+        } else {
+            mLruCache.remove(key);
+        }
     }
 
     public <K, V> Map<K, V> getObjectMap(@Nullable String key, @Nullable Map<K, V> defaultValue) {
