@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
                             sb.append(p);
                             sb.append("\n");
                         }
+                        textView.setText(sb.toString());
                         Logger.d(sb.toString());
                     }
                 });

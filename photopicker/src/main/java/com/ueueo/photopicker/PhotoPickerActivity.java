@@ -186,4 +186,10 @@ public class PhotoPickerActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+    }
 }
