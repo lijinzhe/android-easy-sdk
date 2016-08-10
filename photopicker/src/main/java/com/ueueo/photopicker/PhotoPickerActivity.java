@@ -56,8 +56,8 @@ public class PhotoPickerActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.MIS_NO_ACTIONBAR);
-        setContentView(R.layout.mis_activity_default);
+        setTheme(R.style.UEP_NO_ACTIONBAR);
+        setContentView(R.layout.uep_activity_default);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.BLACK);
@@ -124,14 +124,14 @@ public class PhotoPickerActivity extends AppCompatActivity
     private void updateDoneText(ArrayList<String> resultList) {
         int size = 0;
         if (resultList == null || resultList.size() <= 0) {
-            mSubmitButton.setText(R.string.mis_action_done);
+            mSubmitButton.setText(R.string.uep_action_done);
             mSubmitButton.setEnabled(false);
         } else {
             size = resultList.size();
             mSubmitButton.setEnabled(true);
         }
-        mSubmitButton.setText(getString(R.string.mis_action_button_string,
-                getString(R.string.mis_action_done), size, mDefaultCount));
+        mSubmitButton.setText(getString(R.string.uep_action_button_string,
+                getString(R.string.uep_action_done), size, mDefaultCount));
     }
 
     @Override
@@ -190,6 +190,6 @@ public class PhotoPickerActivity extends AppCompatActivity
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+        overridePendingTransition(R.anim.uep_slide_right_in, R.anim.uep_slide_right_out);
     }
 }

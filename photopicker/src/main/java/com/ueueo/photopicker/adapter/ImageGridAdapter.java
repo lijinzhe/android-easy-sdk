@@ -169,14 +169,14 @@ public class ImageGridAdapter extends BaseAdapter {
 
         if(isShowCamera()){
             if(i == 0){
-                view = mInflater.inflate(R.layout.mis_list_item_camera, viewGroup, false);
+                view = mInflater.inflate(R.layout.uep_list_item_camera, viewGroup, false);
                 return view;
             }
         }
 
         ViewHolder holder;
         if(view == null){
-            view = mInflater.inflate(R.layout.mis_list_item_image, viewGroup, false);
+            view = mInflater.inflate(R.layout.uep_list_item_image, viewGroup, false);
             holder = new ViewHolder(view);
         }else{
             holder = (ViewHolder) view.getTag();
@@ -208,11 +208,11 @@ public class ImageGridAdapter extends BaseAdapter {
                 indicator.setVisibility(View.VISIBLE);
                 if(mSelectedImages.contains(data)){
                     // 设置选中状态
-                    indicator.setImageResource(R.drawable.mis_btn_selected);
+                    indicator.setImageResource(R.drawable.uep_btn_selected);
                     mask.setVisibility(View.VISIBLE);
                 }else{
                     // 未选择
-                    indicator.setImageResource(R.drawable.mis_btn_unselected);
+                    indicator.setImageResource(R.drawable.uep_btn_unselected);
                     mask.setVisibility(View.GONE);
                 }
             }else{
@@ -223,14 +223,14 @@ public class ImageGridAdapter extends BaseAdapter {
                 // 显示图片
                 Glide.with(mContext)
                         .load(imageFile)
-                        .error(R.drawable.mis_default_error)
+                        .error(R.drawable.uep_default_error)
                         .thumbnail(0.5f)
                         .override(mGridWidth,mGridWidth)
                         .dontAnimate()
                         .centerCrop()
                         .into(image);
             }else{
-                image.setImageResource(R.drawable.mis_default_error);
+                image.setImageResource(R.drawable.uep_default_error);
             }
         }
     }

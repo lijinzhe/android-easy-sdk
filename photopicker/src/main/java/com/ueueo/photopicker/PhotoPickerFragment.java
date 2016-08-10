@@ -201,7 +201,7 @@ public class PhotoPickerFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.mis_fragment_multi_image, container, false);
+        return inflater.inflate(R.layout.uep_fragment_multi_image, container, false);
     }
 
     @Override
@@ -221,7 +221,7 @@ public class PhotoPickerFragment extends Fragment {
         mPopupAnchorView = view.findViewById(R.id.footer);
 
         mCategoryText = (TextView) view.findViewById(R.id.category_btn);
-        mCategoryText.setText(R.string.mis_folder_all);
+        mCategoryText.setText(R.string.uep_folder_all);
         mCategoryText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -293,7 +293,7 @@ public class PhotoPickerFragment extends Fragment {
 
                         if (index == 0) {
                             getActivity().getSupportLoaderManager().restartLoader(LOADER_ALL, null, mLoaderCallback);
-                            mCategoryText.setText(R.string.mis_folder_all);
+                            mCategoryText.setText(R.string.uep_folder_all);
                             if (showCamera()) {
                                 mImageAdapter.setShowCamera(true);
                             } else {
@@ -377,7 +377,7 @@ public class PhotoPickerFragment extends Fragment {
      */
     private void showCameraAction() {
         if (selectImageCount() == resultList.size()) {
-            Toast.makeText(getActivity(), R.string.mis_msg_amount_limit, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.uep_msg_amount_limit, Toast.LENGTH_SHORT).show();
             return;
         }
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
@@ -396,10 +396,10 @@ public class PhotoPickerFragment extends Fragment {
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mTmpFile));
                     startActivityForResult(intent, REQUEST_CAMERA);
                 } else {
-                    Toast.makeText(getActivity(), R.string.mis_error_image_not_exist, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.uep_error_image_not_exist, Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(getActivity(), R.string.mis_msg_no_camera, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.uep_msg_no_camera, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -429,7 +429,7 @@ public class PhotoPickerFragment extends Fragment {
                     }
                 } else {
                     if (selectImageCount() == resultList.size()) {
-                        Toast.makeText(getActivity(), R.string.mis_msg_amount_limit, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.uep_msg_amount_limit, Toast.LENGTH_SHORT).show();
                         return;
                     }
                     resultList.add(image.path);
