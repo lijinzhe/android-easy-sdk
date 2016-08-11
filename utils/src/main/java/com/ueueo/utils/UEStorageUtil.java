@@ -15,7 +15,7 @@ import java.io.File;
  * @author Lee
  * @date 2014-3-19
  */
-public class StorageUtil {
+public class UEStorageUtil {
 
     /**
      * 是否有SD卡

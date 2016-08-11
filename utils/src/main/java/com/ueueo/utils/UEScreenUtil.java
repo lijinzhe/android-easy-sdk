@@ -9,7 +9,7 @@ import android.content.res.Resources;
  * @author Lee
  * @date 2014-3-19
  */
-public class ScreenUtil {
+public class UEScreenUtil {
 
     /**
      * 获取状态栏高度

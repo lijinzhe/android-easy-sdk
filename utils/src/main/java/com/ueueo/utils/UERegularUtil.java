@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  *
  * Created by Lee on 16/7/20.
  */
-public class RegularUtil {
+public class UERegularUtil {
 
     /**
      * 验证手机号（简单）
@@ -49,7 +49,7 @@ public class RegularUtil {
      * 验证IP地址
      */
     private static final String REGEX_IP = "((2[0-4]\\d|25[0-5]|[01]?\\d\\d?)\\.){3}(2[0-4]\\d|25[0-5]|[01]?\\d\\d?)";
-    private RegularUtil() {
+    private UERegularUtil() {
         throw new UnsupportedOperationException("u can't fuck me...");
     }
 

@@ -17,7 +17,7 @@ import android.telephony.TelephonyManager;
  * @author Lee
  * @date 2014-3-19
  */
-public class NetworkUtil {
+public class UENetworkUtil {
 
     /**
      * 打开wifi网络设置界面

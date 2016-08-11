@@ -17,7 +17,7 @@ import java.util.List;
  * 电话相关工具
  * Created by Lee on 16/7/20.
  */
-public class PhoneUtil {
+public class UEPhoneUtil {
 
     /**
      * 判断设备是否是手机

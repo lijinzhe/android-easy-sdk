@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
  * 加密解密工具
  * Created by Lee on 16/7/20.
  */
-public class EncryptUtil {
+public class UEEncryptUtil {
 
     /**
      * MD5加密

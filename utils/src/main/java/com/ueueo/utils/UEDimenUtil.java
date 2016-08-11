@@ -7,7 +7,7 @@ import android.util.TypedValue;
  * 尺寸转换工具
  * Created by Lee on 16/7/20.
  */
-public class DimenUtil {
+public class UEDimenUtil {
 
     public static int dpToPx(Context context, int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());

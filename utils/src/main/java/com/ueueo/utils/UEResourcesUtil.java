@@ -10,7 +10,7 @@ import android.graphics.drawable.Drawable;
  * 主要用于resources中sdk版本适配问题
  * Created by Lee on 16/8/9.
  */
-public class ResourcesUtil {
+public class UEResourcesUtil {
     public static int getColor(Context context, int resId) {
         if (android.os.Build.VERSION.SDK_INT < 23) {
             return context.getResources().getColor(resId);

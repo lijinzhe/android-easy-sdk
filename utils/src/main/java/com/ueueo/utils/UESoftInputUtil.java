@@ -11,7 +11,7 @@ import android.view.inputmethod.InputMethodManager;
  * @author Lee
  * @date 16/5/28
  */
-public class SoftInputUtil {
+public class UESoftInputUtil {
 
     /**
      * 隐藏软键盘
