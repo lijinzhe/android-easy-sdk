@@ -34,7 +34,7 @@ final class LoggerPrinter implements Printer {
      * so 4000 bytes is used as chunk size since default charset
      * is UTF-8
      */
-    private static final int CHUNK_SIZE = 4000;
+//    private static final int CHUNK_SIZE = 4000;
 
     /**
      * It is used for json pretty print
@@ -53,8 +53,8 @@ final class LoggerPrinter implements Printer {
     private static final char BOTTOM_LEFT_CORNER = '╚';
     private static final char MIDDLE_CORNER = '╟';
     private static final char HORIZONTAL_DOUBLE_LINE = '║';
-    private static final String DOUBLE_DIVIDER = "════════════════════════════════════════════════════════════════════════════════════════";
-    private static final String SINGLE_DIVIDER = "────────────────────────────────────────────────────────────────────────────────────────";
+    private static final String DOUBLE_DIVIDER = "════════════════════════════════════════════";
+    private static final String SINGLE_DIVIDER = "────────────────────────────────────────────";
     private static final String TOP_BORDER = TOP_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
     private static final String BOTTOM_BORDER = BOTTOM_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
     private static final String MIDDLE_BORDER = MIDDLE_CORNER + SINGLE_DIVIDER + SINGLE_DIVIDER;
@@ -268,8 +268,8 @@ final class LoggerPrinter implements Printer {
         logHeaderContent(logType, tag, methodCount);
 
         //get bytes of message with system's default charset (which is UTF-8 for Android)
-        byte[] bytes = message.getBytes();
-        int length = bytes.length;
+//        byte[] bytes = message.getBytes();
+//        int length = bytes.length;
         if (methodCount > 0) {
             logDivider(logType, tag);
         }
@@ -285,15 +285,15 @@ final class LoggerPrinter implements Printer {
                 logDivider(logType, tag);
             }
         }
-        if (length <= CHUNK_SIZE) {
-            logContent(logType, tag, message);
-        }else{
-            for (int i = 0; i < length; i += CHUNK_SIZE) {
-                int count = Math.min(length - i, CHUNK_SIZE);
-                //create a new String with system's default charset (which is UTF-8 for Android)
-                logContent(logType, tag, new String(bytes, i, count));
-            }
-        }
+//        if (length <= CHUNK_SIZE) {
+        logContent(logType, tag, message);
+//        }else{
+//            for (int i = 0; i < length; i += CHUNK_SIZE) {
+//                int count = Math.min(length - i, CHUNK_SIZE);
+//                //create a new String with system's default charset (which is UTF-8 for Android)
+//                logContent(logType, tag, new String(bytes, i, count));
+//            }
+//        }
         String footerString = footerMessage.toString();
         footerMessage.setLength(0);
         if (!TextUtils.isEmpty(footerString)) {
