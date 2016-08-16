@@ -34,6 +34,20 @@ public class UEPhoneUtil {
     }
 
     /**
+     * 获取电话号码
+     * <p/>
+     * 需要权限
+     * <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+     */
+    public static String getPhoneNumber(Context context) {
+        if (context == null) {
+            throw new RuntimeException("context must not null");
+        }
+        TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        return telephonyManager.getLine1Number();
+    }
+
+    /**
      * 获取当前设备的IMIE
      * <p/>
      * 需添加权限
