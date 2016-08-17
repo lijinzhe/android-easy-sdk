@@ -3,6 +3,8 @@ package com.ueueo.sample;
 import android.content.Intent;
 
 import com.ueueo.sample.glidetransfer.GlideTransferActivity;
+import com.ueueo.sample.pulltorefresh.PullToRefreshActivity;
+import com.ueueo.sample.widget.WidgetActivity;
 
 public class MainActivity extends AbsListActivity {
 
@@ -12,6 +14,20 @@ public class MainActivity extends AbsListActivity {
             @Override
             public void onItemClick() {
                 Intent intent = new Intent(MainActivity.this, GlideTransferActivity.class);
+                startActivity(intent);
+            }
+        });
+        addItemData(new ItemObject("widget") {
+            @Override
+            public void onItemClick() {
+                Intent intent = new Intent(MainActivity.this, WidgetActivity.class);
+                startActivity(intent);
+            }
+        });
+        addItemData(new ItemObject("pull to refresh") {
+            @Override
+            public void onItemClick() {
+                Intent intent = new Intent(MainActivity.this, PullToRefreshActivity.class);
                 startActivity(intent);
             }
         });

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.ueueo.glidetransfer.BlurTransfer;
 import com.ueueo.glidetransfer.ColorFilterTransfer;
 import com.ueueo.glidetransfer.CropCircleTransfer;
+import com.ueueo.glidetransfer.CropRectangleTransfer;
 import com.ueueo.glidetransfer.CropSquareTransfer;
 import com.ueueo.glidetransfer.CropTransfer;
 import com.ueueo.glidetransfer.GrayscaleTransfer;
@@ -25,10 +26,22 @@ import com.ueueo.glidetransfer.RoundCornerTransfer;
 import com.ueueo.sample.R;
 import com.ueueo.utils.UEDimenUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GlideTransferActivity extends AppCompatActivity {
+
+    private String[] mTransferTypes = new String[]{
+            "Mask",
+            "NinePatchMask",
+            "CropTop",
+            "CropCenter",
+            "CropBottom",
+            "CropSquare",
+            "CropRectangle",
+            "CropCircle",
+            "ColorFilter",
+            "Grayscale",
+            "RoundedCorners",
+            "Blur50",
+            "Blur100"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +49,7 @@ public class GlideTransferActivity extends AppCompatActivity {
         RecyclerView recyclerView = new RecyclerView(this);
         setContentView(recyclerView);
 
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         recyclerView.setAdapter(new GlideTransferAdapter(this));
     }
@@ -44,11 +57,9 @@ public class GlideTransferActivity extends AppCompatActivity {
     public class GlideTransferAdapter extends RecyclerView.Adapter<GlideTransferAdapter.ViewHolder> {
 
         private Context mContext;
-        private TransferType[] mDataSet;
 
         public GlideTransferAdapter(Context context) {
             mContext = context;
-            mDataSet = TransferType.values();
         }
 
         @Override
@@ -59,19 +70,19 @@ public class GlideTransferActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            switch (mDataSet[position]) {
-                case Mask: {
+            switch (mTransferTypes[position]) {
+                case "Mask": {
                     int width = UEDimenUtil.dpToPx(mContext, 133);
                     int height = UEDimenUtil.dpToPx(mContext, 126);
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .override(width, height)
-                            .bitmapTransform(
+                            .bitmapTransform(new CenterCrop(mContext),
                                     new MaskTransfer(mContext, R.drawable.glidetransfer_mask_starfish))
                             .into(holder.image);
                     break;
                 }
-                case NinePatchMask: {
+                case "NinePatchMask": {
                     int width = UEDimenUtil.dpToPx(mContext, 150);
                     int height = UEDimenUtil.dpToPx(mContext, 100);
                     Glide.with(mContext)
@@ -82,20 +93,20 @@ public class GlideTransferActivity extends AppCompatActivity {
                             .into(holder.image);
                     break;
                 }
-                case CropTop:
+                case "CropTop":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(
                                     new CropTransfer(mContext, 300, 100, CropTransfer.CropType.TOP))
                             .into(holder.image);
                     break;
-                case CropCenter:
+                case "CropCenter":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(new CropTransfer(mContext, 300, 100))
                             .into(holder.image);
                     break;
-                case CropBottom:
+                case "CropBottom":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(
@@ -103,44 +114,50 @@ public class GlideTransferActivity extends AppCompatActivity {
                             .into(holder.image);
 
                     break;
-                case CropSquare:
+                case "CropSquare":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(new CropSquareTransfer(mContext))
                             .into(holder.image);
                     break;
-                case CropCircle:
+                case "CropRectangle":
+                    Glide.with(mContext)
+                            .load(R.drawable.glidetransfer_image)
+                            .bitmapTransform(new CropRectangleTransfer(mContext, 0.5f))
+                            .into(holder.image);
+                    break;
+                case "CropCircle":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(new CropCircleTransfer(mContext))
                             .into(holder.image);
                     break;
-                case ColorFilter:
+                case "ColorFilter":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(new ColorFilterTransfer(mContext, Color.argb(80, 255, 0, 0)))
                             .into(holder.image);
                     break;
-                case Grayscale:
+                case "Grayscale":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(new GrayscaleTransfer(mContext))
                             .into(holder.image);
                     break;
-                case RoundedCorners:
+                case "RoundedCorners":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(new RoundCornerTransfer(mContext, 40, 0,
                                     RoundCornerTransfer.CornerType.ALL))
                             .into(holder.image);
                     break;
-                case Blur50:
+                case "Blur50":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(new BlurTransfer(mContext, 50))
                             .into(holder.image);
                     break;
-                case Blur100:
+                case "Blur100":
                     Glide.with(mContext)
                             .load(R.drawable.glidetransfer_image)
                             .bitmapTransform(new BlurTransfer(mContext, 100))
@@ -148,12 +165,12 @@ public class GlideTransferActivity extends AppCompatActivity {
                     break;
 
             }
-            holder.title.setText(mDataSet[position].name());
+            holder.title.setText(mTransferTypes[position]);
         }
 
         @Override
         public int getItemCount() {
-            return mDataSet.length;
+            return mTransferTypes.length;
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {

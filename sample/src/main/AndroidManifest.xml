@@ -52,6 +52,12 @@
         </activity>
         <activity android:name=".rxjava.RxJavaActivity" android:label="RxJava"/>
         <activity android:name=".glidetransfer.GlideTransferActivity" android:label="Glide Transfer"/>
+        <activity android:name=".widget.WidgetActivity" android:label="Widget"/>
+        <activity android:name=".widget.UEImageViewActivity" android:label="Widget UEImageView"/>
+        <activity android:name=".widget.UETextViewActivity" android:label="Widget UETextView"/>
+        <activity android:name=".pulltorefresh.PullToRefreshActivity" android:label="PullToRefresh"/>
+        <activity android:name=".pulltorefresh.PTRListViewActivity" android:label="ListView"/>
+        <activity android:name=".pulltorefresh.PTRRecylerViewActivity" android:label="RecylerView"/>
     </application>
 
 </manifest>

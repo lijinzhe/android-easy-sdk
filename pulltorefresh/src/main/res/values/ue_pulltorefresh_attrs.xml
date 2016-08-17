@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PullToRefreshLayout">
+        <!-- Optional. If you put header and content in xml, you can you these to specify them. -->
+        <attr name="header" format="reference"/>
+        <attr name="content" format="reference"/>
+        <attr name="footer" format="reference"/>
+
+        <!-- the resistance when you are moving the frame -->
+        <attr name="resistance" format="float"/>
+
+        <!-- the ration of the height of the header to trigger refresh -->
+        <attr name="ratioOfHeaderHeightToRefresh" format="float"/>
+
+        <attr name="durationToClose" format="integer"/>
+        <attr name="durationToCloseHeader" format="integer"/>
+
+        <!-- pull to refresh, otherwise release to refresh, default is release to refresh -->
+        <attr name="pullToRefreshEnable" format="boolean"/>
+
+        <attr name="pullToLoadMoreEnable" format="boolean"/>
+
+        <!-- keep header when refreshing-->
+        <attr name="keepHeaderWhenRefresh" format="boolean"/>
+    </declare-styleable>
+
+</resources>
