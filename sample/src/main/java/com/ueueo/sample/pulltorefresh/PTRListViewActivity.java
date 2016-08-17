@@ -78,7 +78,7 @@ public class PTRListViewActivity extends AppCompatActivity {
             @Override
             public void run() {
                 size = 10;
-                mPtrFrame.refreshComplete();
+                mPtrFrame.refreshFailed();
                 mAdapter.notifyDataSetChanged();
             }
         }, 3000);
@@ -89,8 +89,7 @@ public class PTRListViewActivity extends AppCompatActivity {
             @Override
             public void run() {
                 size += 10;
-                mPtrFrame.refreshComplete();
-                mPtrFrame.setPullToLoadMoreEnable(false);
+                mPtrFrame.refreshFailed();
                 mAdapter.notifyDataSetChanged();
             }
         }, 3000);

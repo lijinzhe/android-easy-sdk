@@ -72,6 +72,8 @@ public class PullToRefreshLayout extends ViewGroup {
     private long mLoadingStartTime = 0;
     private Indicator mIndicator;
     private boolean mHasSendCancelEvent = false;
+    private boolean isSuccess = true;
+
     private Runnable mPerformRefreshCompleteDelay = new Runnable() {
         @Override
         public void run() {
@@ -449,7 +451,7 @@ public class PullToRefreshLayout extends ViewGroup {
 
                 boolean canHeaderMoveDown = mPullToRefreshEnable && mPullToRefreshHandler != null
                         && mPullToRefreshHandler.checkCanDoRefresh(this, mContent, mHeaderView);
-                boolean canFooterMoveUp = mPullToLoadMoreEnable &&  mPullToLoadMoreHandler != null
+                boolean canFooterMoveUp = mPullToLoadMoreEnable && mPullToLoadMoreHandler != null
                         && mFooterView != null // The footer view could be null, so need double check
                         && mPullToLoadMoreHandler.checkCanDoLoadMore(this, mContent, mFooterView);
 
@@ -781,15 +783,23 @@ public class PullToRefreshLayout extends ViewGroup {
         return mStatus == PTR_STATUS_LOADING;
     }
 
+    public void refreshSuccess() {
+        refreshComplete(true);
+    }
+
+    public void refreshFailed() {
+        refreshComplete(false);
+    }
+
     /**
      * Call this when data is loaded.
      * The UI will perform complete at once or after a delay, depends on the time elapsed is greater then {@link #mLoadingMinTime} or not.
      */
-    final public void refreshComplete() {
+    final public void refreshComplete(boolean isSuccess) {
         if (DEBUG) {
             Log.i(LOG_TAG, "refreshComplete");
         }
-
+        this.isSuccess = isSuccess;
         if (mRefreshCompleteHook != null) {
             mRefreshCompleteHook.reset();
         }
@@ -848,7 +858,7 @@ public class PullToRefreshLayout extends ViewGroup {
             if (DEBUG) {
                 Log.i(LOG_TAG, "PtrUIHandler: onUIRefreshComplete");
             }
-            mUIListenerHolder.onUIRefreshComplete(this);
+            mUIListenerHolder.onUIRefreshComplete(this, this.isSuccess);
         }
         mIndicator.onUIRefreshComplete();
         tryScrollBackToTopAfterComplete();

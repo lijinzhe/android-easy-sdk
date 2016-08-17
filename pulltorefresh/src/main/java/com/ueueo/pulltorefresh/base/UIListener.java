@@ -27,7 +27,7 @@ public interface UIListener {
     /**
      * perform UI after refresh
      */
-    void onUIRefreshComplete(PullToRefreshLayout frame);
+    void onUIRefreshComplete(PullToRefreshLayout frame, boolean isSuccess);
 
     void onUIPositionChange(PullToRefreshLayout frame, boolean isUnderTouch, byte status, Indicator ptrIndicator);
 }

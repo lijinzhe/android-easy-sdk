@@ -142,13 +142,17 @@ public class UEPullToRefreshHeader extends FrameLayout implements UIListener {
     }
 
     @Override
-    public void onUIRefreshComplete(PullToRefreshLayout frame) {
+    public void onUIRefreshComplete(PullToRefreshLayout frame,boolean isSuccess) {
 
         hideRotateView();
         mProgressBar.setVisibility(INVISIBLE);
 
         mTitleTextView.setVisibility(VISIBLE);
-        mTitleTextView.setText(getResources().getString(R.string.ue_ptr_refresh_complete));
+        if(isSuccess) {
+            mTitleTextView.setText(getResources().getString(R.string.ue_ptr_refresh_success));
+        }else{
+            mTitleTextView.setText(getResources().getString(R.string.ue_ptr_refresh_failed));
+        }
 
         // update last update time
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(KEY_SharedPreferences, 0);

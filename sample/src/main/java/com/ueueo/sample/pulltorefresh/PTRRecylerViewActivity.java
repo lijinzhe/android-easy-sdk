@@ -71,7 +71,7 @@ public class PTRRecylerViewActivity extends AppCompatActivity {
             @Override
             public void run() {
                 size = 10;
-                mPtrFrame.refreshComplete();
+                mPtrFrame.refreshSuccess();
                 mAdapter.notifyDataSetChanged();
             }
         }, 3000);
@@ -82,7 +82,7 @@ public class PTRRecylerViewActivity extends AppCompatActivity {
             @Override
             public void run() {
                 size += 10;
-                mPtrFrame.refreshComplete();
+                mPtrFrame.refreshSuccess();
                 mPtrFrame.setPullToLoadMoreEnable(false);
                 mAdapter.notifyDataSetChanged();
             }

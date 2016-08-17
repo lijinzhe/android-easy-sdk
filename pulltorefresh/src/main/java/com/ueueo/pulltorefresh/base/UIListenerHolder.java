@@ -134,12 +134,12 @@ class UIListenerHolder implements UIListener {
     }
 
     @Override
-    public void onUIRefreshComplete(PullToRefreshLayout frame) {
+    public void onUIRefreshComplete(PullToRefreshLayout frame,boolean isSuccess) {
         UIListenerHolder current = this;
         do {
             final UIListener handler = current.getHandler();
             if (null != handler) {
-                handler.onUIRefreshComplete(frame);
+                handler.onUIRefreshComplete(frame,isSuccess);
             }
         } while ((current = current.mNext) != null);
     }
