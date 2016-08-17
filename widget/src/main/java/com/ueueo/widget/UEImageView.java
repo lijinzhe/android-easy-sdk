@@ -100,7 +100,7 @@ public class UEImageView extends ImageView {
         if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE) {
             mAspectRatio = 1;
         }
-        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth >= 0) {
+        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth > 0 || mBorderRadius > 0) {
             setScaleType(ScaleType.CENTER_CROP);
         }
         initializeBitmap();
@@ -121,15 +121,26 @@ public class UEImageView extends ImageView {
         refreshDrawableState();
     }
 
+    /**
+     * 设置形状
+     * <p/>
+     * 此方法必须在setImageResource()等设置图片的方法前调用，否则无效
+     *
+     * @param shape
+     */
     public void setShape(int shape) {
         mShape = shape;
-        requestLayout();
-        initializeBitmap();
+        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE) {
+            mAspectRatio = 1;
+        }
+        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth > 0 || mBorderRadius > 0) {
+            setScaleType(ScaleType.CENTER_CROP);
+        }
     }
 
     @Override
     public ScaleType getScaleType() {
-        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth >= 0) {
+        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth > 0 || mBorderRadius > 0) {
             return ScaleType.CENTER_CROP;
         } else {
             return super.getScaleType();
@@ -138,7 +149,7 @@ public class UEImageView extends ImageView {
 
     @Override
     public void setScaleType(ScaleType scaleType) {
-        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth >= 0) {
+        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth > 0 || mBorderRadius > 0) {
             if (scaleType != ScaleType.CENTER_CROP) {
                 throw new IllegalArgumentException(String.format("ScaleType %s not supported.", scaleType));
             }
@@ -149,7 +160,7 @@ public class UEImageView extends ImageView {
 
     @Override
     public void setAdjustViewBounds(boolean adjustViewBounds) {
-        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth >= 0) {
+        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth >= 0 || mBorderRadius > 0) {
             if (adjustViewBounds) {
                 throw new IllegalArgumentException("adjustViewBounds not supported.");
             }
@@ -204,7 +215,7 @@ public class UEImageView extends ImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth >= 0) {
+        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth > 0 || mBorderRadius > 0) {
             if (mBitmap == null) {
                 return;
             }
@@ -219,7 +230,7 @@ public class UEImageView extends ImageView {
             if (mShape == SHAPE_CIRCLE) {
                 canvas.drawCircle(mDrawableRect.centerX(), mDrawableRect.centerY(), mDrawableRect.width() / 2.0f, mBitmapPaint);
                 if (mBorderWidth > 0) {
-                    canvas.drawCircle(mBorderRect.centerX(), mBorderRect.centerY(), mBorderRadius, mBorderPaint);
+                    canvas.drawCircle(mBorderRect.centerX(), mBorderRect.centerY(), mDrawableRect.width() / 2.0f, mBorderPaint);
                 }
             } else {
                 canvas.drawRoundRect(mDrawableRect, mBorderRadius, mBorderRadius, mBitmapPaint);
@@ -296,30 +307,29 @@ public class UEImageView extends ImageView {
     }
 
     private void initializeBitmap() {
-        if (mShape == SHAPE_NORMAL && mBorderWidth <= 0) {
-            return;
-        }
         mBitmap = null;
-        Drawable drawable = getDrawable();
-        if (drawable != null) {
-            if (drawable instanceof BitmapDrawable) {
-                mBitmap = ((BitmapDrawable) drawable).getBitmap();
-            } else {
-                try {
-                    Bitmap bitmap;
+        if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE || mBorderWidth > 0 || mBorderRadius > 0) {
+            Drawable drawable = getDrawable();
+            if (drawable != null) {
+                if (drawable instanceof BitmapDrawable) {
+                    mBitmap = ((BitmapDrawable) drawable).getBitmap();
+                } else {
+                    try {
+                        Bitmap bitmap;
 
-                    if (drawable instanceof ColorDrawable) {
-                        bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888);
-                    } else {
-                        bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                        if (drawable instanceof ColorDrawable) {
+                            bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888);
+                        } else {
+                            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                        }
+
+                        Canvas canvas = new Canvas(bitmap);
+                        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                        drawable.draw(canvas);
+                        mBitmap = bitmap;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-
-                    Canvas canvas = new Canvas(bitmap);
-                    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-                    drawable.draw(canvas);
-                    mBitmap = bitmap;
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -327,7 +337,7 @@ public class UEImageView extends ImageView {
     }
 
     private void initializeBitmapPaint() {
-        if (mShape == SHAPE_NORMAL && mBorderWidth <= 0) {
+        if (mShape == SHAPE_NORMAL && mBorderWidth <= 0 && mBorderRadius <= 0) {
             return;
         }
 
@@ -348,11 +358,9 @@ public class UEImageView extends ImageView {
         mBorderPaint.setColor(mBorderColor);
         mBorderPaint.setStrokeWidth(mBorderWidth);
         mBorderRect.set(calculateBounds());
-
-        if (mShape == SHAPE_CIRCLE) {
-            mBorderRadius = (int) Math.min((mBorderRect.height() - mBorderWidth) / 2.0f, (mBorderRect.width() - mBorderWidth) / 2.0f);
-        }
-
+        //如果不加inset画边框时会存在截取的问题
+        int inset = (int) (mBorderWidth / 2f + 0.5f);
+        mBorderRect.inset(inset, inset);
         mDrawableRect.set(mBorderRect);
 
         updateShaderMatrix();
@@ -369,10 +377,7 @@ public class UEImageView extends ImageView {
         if (mShape == SHAPE_CIRCLE || mShape == SHAPE_SQUARE) {
             sideWidth = sideHeight = Math.min(availableWidth, availableHeight);
         } else if (mAspectRatio > 0) {
-
             float curRatio = (float) availableWidth / (float) availableHeight;
-            int offsetX = 0;
-            int offsetY = 0;
             if (curRatio > mAspectRatio) {
                 //截取宽
                 sideWidth = (int) (availableHeight * mAspectRatio);
