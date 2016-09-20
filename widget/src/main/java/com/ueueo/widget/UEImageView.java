@@ -22,9 +22,9 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 /**
- * 1.可设置宽高比，正方形
- * 2.可设置圆形
- * 3.可设置圆边以及圆边的角度
+ * 1.可设置宽高比
+ * 2.可设置圆形，正方形
+ * 3.可设置边框（颜色，宽度）
  * 4.可设置按下阴影效果
  * <p/>
  * Created by Lee on 16/8/11.
