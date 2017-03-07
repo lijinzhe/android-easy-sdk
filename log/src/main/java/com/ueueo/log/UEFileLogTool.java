@@ -3,11 +3,7 @@ package com.ueueo.log;
 import android.content.Context;
 import android.util.Log;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +11,7 @@ import java.util.HashMap;
 /**
  * 可以将日志打印到文件中
  */
-public class AndroidFileLogTool implements LogTool {
+public class UEFileLogTool implements UELogTool {
 
     // 日志文件保存的文件夹目录
     private static String LOG_DIR_PATH;
@@ -23,56 +19,41 @@ public class AndroidFileLogTool implements LogTool {
     private static HashMap<String, File> mLogFiles = new HashMap<>();
 
     /**
-     * 指定日志文件存储路径
-     *
-     * @param logDirPath
-     */
-    public AndroidFileLogTool(String logDirPath) {
-        LOG_DIR_PATH = logDirPath;
-    }
-
-    /**
      * 日志文件存储路径为程序内的Log文件夹下
      *
      * @param context
      */
-    public AndroidFileLogTool(Context context) {
+    public UEFileLogTool(Context context) {
         LOG_DIR_PATH = context.getExternalFilesDir("LOG").getAbsolutePath();
     }
 
     @Override
     public void d(String tag, String message) {
-        Log.d(tag, message);
         writeToFile(Log.DEBUG, tag, message);
     }
 
     @Override
     public void e(String tag, String message) {
-        Log.e(tag, message);
         writeToFile(Log.ERROR, tag, message);
     }
 
     @Override
     public void w(String tag, String message) {
-        Log.w(tag, message);
         writeToFile(Log.WARN, tag, message);
     }
 
     @Override
     public void i(String tag, String message) {
-        Log.i(tag, message);
         writeToFile(Log.INFO, tag, message);
     }
 
     @Override
     public void v(String tag, String message) {
-        Log.v(tag, message);
         writeToFile(Log.VERBOSE, tag, message);
     }
 
     @Override
     public void wtf(String tag, String message) {
-        Log.wtf(tag, message);
         writeToFile(Log.ERROR, tag, message);
     }
 

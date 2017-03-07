@@ -1,6 +1,6 @@
 package com.ueueo.log;
 
-public interface LogTool {
+public interface UELogTool {
     void d(String tag, String message);
 
     void e(String tag, String message);

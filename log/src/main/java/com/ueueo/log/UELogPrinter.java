@@ -1,33 +1,27 @@
 package com.ueueo.log;
 
+import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
 /**
  * Logger is a wrapper for logging utils
  * But more pretty, simple and powerful
  */
-final class LoggerPrinter implements Printer {
+final class UELogPrinter {
 
     /**
      * Android's max limit for a log entry is ~4076 bytes,
@@ -64,6 +58,7 @@ final class LoggerPrinter implements Printer {
      */
     private final ThreadLocal<String> localTag = new ThreadLocal<>();
     private final ThreadLocal<Integer> localMethodCount = new ThreadLocal<>();
+    private final ThreadLocal<Boolean> localIsSaveFile = new ThreadLocal<>();
     /**
      * tag is used for the Log, the name is a little different
      * in order to differentiate the logs easily with the filter
@@ -72,7 +67,7 @@ final class LoggerPrinter implements Printer {
     /**
      * It is used to determine log settings such as method count, thread info visibility
      */
-    private Settings settings;
+    private UELogSetting settings;
     private StringBuffer headerMessage = new StringBuffer();
     private StringBuffer footerMessage = new StringBuffer();
 
@@ -81,8 +76,7 @@ final class LoggerPrinter implements Printer {
      *
      * @param tag is the given string which will be used in Logger
      */
-    @Override
-    public Settings init(String tag) {
+    public UELogSetting init(String tag, Application application) {
         if (tag == null) {
             throw new NullPointerException("tag may not be null");
         }
@@ -90,31 +84,32 @@ final class LoggerPrinter implements Printer {
             throw new IllegalStateException("tag may not be empty");
         }
         this.tag = tag;
-        this.settings = new Settings();
+        this.settings = new UELogSetting(application);
         return settings;
     }
 
-    @Override
-    public Settings getSettings() {
+    public UELogSetting getSettings() {
         return settings;
     }
 
-    @Override
-    public Printer tag(String tag) {
+    public UELogPrinter tag(String tag) {
         if (tag != null) {
             localTag.set(tag);
         }
         return this;
     }
 
-    @Override
-    public Printer method(int methodCount) {
+    public UELogPrinter method(int methodCount) {
         localMethodCount.set(methodCount);
         return this;
     }
 
-    @Override
-    public Printer header(String message, Object... args) {
+    public UELogPrinter save(boolean save){
+        localIsSaveFile.set(save);
+        return this;
+    }
+
+    public UELogPrinter header(String message, Object... args) {
         String header = createMessage(message, args);
         if (!TextUtils.isEmpty(header)) {
             headerMessage.append(header).append(HEADER_FOOTER_SEPARATOR);
@@ -122,8 +117,7 @@ final class LoggerPrinter implements Printer {
         return this;
     }
 
-    @Override
-    public Printer footer(String message, Object... args) {
+    public UELogPrinter footer(String message, Object... args) {
         String footer = createMessage(message, args);
         if (!TextUtils.isEmpty(footer)) {
             footerMessage.append(footer).append(HEADER_FOOTER_SEPARATOR);
@@ -131,53 +125,44 @@ final class LoggerPrinter implements Printer {
         return this;
     }
 
-    @Override
-    public Printer headerJson(String json) {
+    public UELogPrinter headerJson(String json) {
         headerMessage.append(parseJsonMessage(json)).append(HEADER_FOOTER_SEPARATOR);
         return this;
     }
 
-    @Override
-    public Printer headerXml(String xml) {
+    public UELogPrinter headerXml(String xml) {
         headerMessage.append(parseXmlMessage(xml)).append(HEADER_FOOTER_SEPARATOR);
         return this;
     }
 
-    @Override
-    public Printer headerObject(Object obj) {
+    public UELogPrinter headerObject(Object obj) {
         headerMessage.append(parseObjectMessage(obj)).append(HEADER_FOOTER_SEPARATOR);
         return this;
     }
 
-    @Override
-    public Printer footerJson(String json) {
+    public UELogPrinter footerJson(String json) {
         footerMessage.append(parseJsonMessage(json)).append(HEADER_FOOTER_SEPARATOR);
         return this;
     }
 
-    @Override
-    public Printer footerXml(String xml) {
+    public UELogPrinter footerXml(String xml) {
         footerMessage.append(parseXmlMessage(xml)).append(HEADER_FOOTER_SEPARATOR);
         return this;
     }
 
-    @Override
-    public Printer footerObject(Object obj) {
+    public UELogPrinter footerObject(Object obj) {
         footerMessage.append(parseObjectMessage(obj)).append(HEADER_FOOTER_SEPARATOR);
         return this;
     }
 
-    @Override
     public void d(String message, Object... args) {
-        log(LogLevel.DEBUG, message, args);
+        log(UELogLevel.DEBUG, message, args);
     }
 
-    @Override
     public void e(String message, Object... args) {
         e(null, message, args);
     }
 
-    @Override
     public void e(Throwable throwable, String message, Object... args) {
         if (throwable != null && message != null) {
             message += " : " + Log.getStackTraceString(throwable);
@@ -188,27 +173,23 @@ final class LoggerPrinter implements Printer {
         if (message == null) {
             message = "No message/exception is set";
         }
-        log(LogLevel.ERROR, message, args);
+        log(UELogLevel.ERROR, message, args);
     }
 
-    @Override
     public void w(String message, Object... args) {
-        log(LogLevel.WARN, message, args);
+        log(UELogLevel.WARN, message, args);
     }
 
-    @Override
     public void i(String message, Object... args) {
-        log(LogLevel.INFO, message, args);
+        log(UELogLevel.INFO, message, args);
     }
 
-    @Override
     public void v(String message, Object... args) {
-        log(LogLevel.VERBOSE, message, args);
+        log(UELogLevel.VERBOSE, message, args);
     }
 
-    @Override
     public void wtf(String message, Object... args) {
-        log(LogLevel.ASSERT, message, args);
+        log(UELogLevel.ASSERT, message, args);
     }
 
     /**
@@ -216,7 +197,6 @@ final class LoggerPrinter implements Printer {
      *
      * @param json the json content
      */
-    @Override
     public void json(String json) {
         d(parseJsonMessage(json));
     }
@@ -226,7 +206,6 @@ final class LoggerPrinter implements Printer {
      *
      * @param xml the xml content
      */
-    @Override
     public void xml(String xml) {
         d(parseXmlMessage(xml));
     }
@@ -236,12 +215,10 @@ final class LoggerPrinter implements Printer {
      *
      * @param obj the xml content
      */
-    @Override
     public void object(Object obj) {
         d(parseObjectMessage(obj));
     }
 
-    @Override
     public void clear() {
         settings = null;
     }
@@ -368,26 +345,47 @@ final class LoggerPrinter implements Printer {
     private void logChunk(int logType, String tag, String chunk) {
         String finalTag = formatTag(tag);
         switch (logType) {
-            case LogLevel.ERROR:
-                settings.getLogTool().e(finalTag, chunk);
+            case UELogLevel.ERROR:
+                settings.getAndroidLogTool().e(finalTag, chunk);
+                if (settings.isSavaFile()) {
+                    settings.getFileLogTool().e(finalTag, chunk);
+                }
                 break;
-            case LogLevel.INFO:
-                settings.getLogTool().i(finalTag, chunk);
+            case UELogLevel.INFO:
+                settings.getAndroidLogTool().i(finalTag, chunk);
+                if (settings.isSavaFile()) {
+                    settings.getFileLogTool().i(finalTag, chunk);
+                }
                 break;
-            case LogLevel.VERBOSE:
-                settings.getLogTool().v(finalTag, chunk);
+            case UELogLevel.VERBOSE:
+                settings.getAndroidLogTool().v(finalTag, chunk);
+                if (settings.isSavaFile()) {
+                    settings.getFileLogTool().v(finalTag, chunk);
+                }
                 break;
-            case LogLevel.WARN:
-                settings.getLogTool().w(finalTag, chunk);
+            case UELogLevel.WARN:
+                settings.getAndroidLogTool().w(finalTag, chunk);
+                if (settings.isSavaFile()) {
+                    settings.getFileLogTool().w(finalTag, chunk);
+                }
                 break;
-            case LogLevel.ASSERT:
-                settings.getLogTool().wtf(finalTag, chunk);
+            case UELogLevel.ASSERT:
+                settings.getAndroidLogTool().wtf(finalTag, chunk);
+                if (settings.isSavaFile()) {
+                    settings.getFileLogTool().wtf(finalTag, chunk);
+                }
                 break;
-            case LogLevel.DEBUG:
-                settings.getLogTool().d(finalTag, chunk);
+            case UELogLevel.DEBUG:
+                settings.getAndroidLogTool().d(finalTag, chunk);
+                if (settings.isSavaFile()) {
+                    settings.getFileLogTool().d(finalTag, chunk);
+                }
                 break;
             default:
-                settings.getLogTool().v(finalTag, chunk);
+                settings.getAndroidLogTool().v(finalTag, chunk);
+                if (settings.isSavaFile()) {
+                    settings.getFileLogTool().v(finalTag, chunk);
+                }
                 break;
         }
     }
@@ -443,7 +441,7 @@ final class LoggerPrinter implements Printer {
         for (int i = MIN_STACK_OFFSET; i < trace.length; i++) {
             StackTraceElement e = trace[i];
             String name = e.getClassName();
-            if (!name.equals(LoggerPrinter.class.getName()) && !name.equals(Logger.class.getName())) {
+            if (!name.equals(UELogPrinter.class.getName()) && !name.equals(UELog.class.getName())) {
                 return --i;
             }
         }
@@ -515,7 +513,7 @@ final class LoggerPrinter implements Printer {
             } catch (JSONException e) {
                 return "Invalid object content";
             }
-        }else {
+        } else {
             return "Null object content";
         }
     }

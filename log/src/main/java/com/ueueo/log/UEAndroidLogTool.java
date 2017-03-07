@@ -2,7 +2,7 @@ package com.ueueo.log;
 
 import android.util.Log;
 
-public class AndroidLogTool implements LogTool {
+public class UEAndroidLogTool implements UELogTool {
     @Override
     public void d(String tag, String message) {
         Log.d(tag, message);

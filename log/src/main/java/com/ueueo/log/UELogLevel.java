@@ -3,7 +3,7 @@ package com.ueueo.log;
 /**
  * Log级别
  */
-public class LogLevel {
+public class UELogLevel {
     public static final int VERBOSE = 1;
     public static final int DEBUG = 2;
     public static final int INFO = 3;

@@ -1,6 +1,7 @@
 package com.ueueo.log;
 
 import android.Manifest;
+import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -15,15 +16,15 @@ import android.telephony.TelephonyManager;
  * Info: 用来打印一般提示信息。
  * Warn: 用来打印警告信息，这种信息一般是提示开发者需要注意，有可能会出现问题！
  * Error: 用来打印错误崩溃日志信息，例如在try-catch的catch中输出捕获的错误信息。
- * Assert: 在Log.wtf()作为参数，表面当前问题是个严重的等级。
+ * Assert: 在Log.wtf()作为参数，表明当前问题是个严重的等级。
  */
-public final class Logger {
+public final class UELog {
     private static final String DEFAULT_TAG = "logger";
 
-    private static Printer printer = new LoggerPrinter();
+    private static UELogPrinter printer = new UELogPrinter();
 
     //no instance
-    private Logger() {
+    private UELog() {
     }
 
     /**
@@ -32,7 +33,7 @@ public final class Logger {
      * @return
      */
     public static boolean isDebugEnabled() {
-        return (printer.getSettings().getLogLevel() <= LogLevel.DEBUG);
+        return (printer.getSettings().getLogLevel() <= UELogLevel.DEBUG);
     }
 
     /**
@@ -40,8 +41,8 @@ public final class Logger {
      *
      * @return the settings object
      */
-    public static Settings init() {
-        return init(DEFAULT_TAG);
+    public static UELogSetting init(Application application) {
+        return init(DEFAULT_TAG,application);
     }
 
     /**
@@ -49,9 +50,9 @@ public final class Logger {
      *
      * @param tag is the given string which will be used in Logger as TAG
      */
-    public static Settings init(String tag) {
-        printer = new LoggerPrinter();
-        return printer.init(tag);
+    public static UELogSetting init(String tag, Application application) {
+        printer = new UELogPrinter();
+        return printer.init(tag,application);
     }
 
     public static void clear() {
@@ -59,50 +60,50 @@ public final class Logger {
         printer = null;
     }
 
-    public static Printer tag(String tag) {
+    public static UELogPrinter tag(String tag) {
         return printer.tag(tag);
     }
 
-    public static Printer method(int methodCount) {
+    public static UELogPrinter method(int methodCount) {
         return printer.method(methodCount);
     }
 
-    public static Printer header(String message, Object... args) {
+    public static UELogPrinter header(String message, Object... args) {
         printer.header(message, args);
         return printer;
     }
 
-    public static Printer footer(String message, Object... args) {
+    public static UELogPrinter footer(String message, Object... args) {
         printer.footer(message, args);
         return printer;
     }
 
-    public static Printer headerJson(String json) {
+    public static UELogPrinter headerJson(String json) {
         printer.headerJson(json);
         return printer;
     }
 
-    public static Printer headerXml(String xml) {
+    public static UELogPrinter headerXml(String xml) {
         printer.headerXml(xml);
         return printer;
     }
 
-    public static Printer headerObject(Object obj) {
+    public static UELogPrinter headerObject(Object obj) {
         printer.headerObject(obj);
         return printer;
     }
 
-    public static Printer footerJson(String json) {
+    public static UELogPrinter footerJson(String json) {
         printer.footerJson(json);
         return printer;
     }
 
-    public static Printer footerXml(String xml) {
+    public static UELogPrinter footerXml(String xml) {
         printer.footerXml(xml);
         return printer;
     }
 
-    public static Printer footerObject(Object obj) {
+    public static UELogPrinter footerObject(Object obj) {
         printer.footerObject(obj);
         return printer;
     }
@@ -170,7 +171,7 @@ public final class Logger {
         if (context == null) {
             throw new RuntimeException("context must not null");
         }
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (context.getPackageManager().checkPermission(Manifest.permission.READ_PHONE_STATE, context.getPackageName()) != PackageManager.PERMISSION_GRANTED) {
                 d("Must have permission 'android.permission.READ_PHONE_STATE'");
                 return;
@@ -201,15 +202,48 @@ public final class Logger {
         d(stringBuilder.toString());
     }
 
+    /**
+     * 打印手机存储空间信息
+     *
+     * @param context
+     */
     public static void printStorageInfo(Context context) {
 
     }
 
+    /**
+     * 打印手机内存信息
+     *
+     * @param context
+     */
     public static void printMemoryInfo(Context context) {
 
     }
 
+    /**
+     * 打印网络信息
+     *
+     * @param context
+     */
     public static void printNetworkInfo(Context context) {
+
+    }
+
+    /**
+     * 显示日志悬浮窗
+     *
+     * @param context
+     */
+    public static void showFloatWidget(Context context) {
+
+    }
+
+    /**
+     * 关闭日志悬浮窗
+     *
+     * @param context
+     */
+    public static void hideFloatWidget(Context context) {
 
     }
 }
