@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.ueueo.sample.glidetransfer.GlideTransferActivity;
 import com.ueueo.sample.pulltorefresh.PullToRefreshActivity;
+import com.ueueo.sample.rxjava.RxJavaActivity;
 import com.ueueo.sample.widget.WidgetActivity;
 
 public class MainActivity extends AbsListActivity {
@@ -28,6 +29,13 @@ public class MainActivity extends AbsListActivity {
             @Override
             public void onItemClick() {
                 Intent intent = new Intent(MainActivity.this, PullToRefreshActivity.class);
+                startActivity(intent);
+            }
+        });
+        addItemData(new ItemObject("rxjava") {
+            @Override
+            public void onItemClick() {
+                Intent intent = new Intent(MainActivity.this, RxJavaActivity.class);
                 startActivity(intent);
             }
         });
