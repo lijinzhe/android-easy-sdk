@@ -58,6 +58,7 @@
         <activity android:name=".pulltorefresh.PullToRefreshActivity" android:label="PullToRefresh"/>
         <activity android:name=".pulltorefresh.PTRListViewActivity" android:label="ListView"/>
         <activity android:name=".pulltorefresh.PTRRecylerViewActivity" android:label="RecylerView"/>
+        <activity android:name=".log.LogActivity" android:label="Log"/>
     </application>
 
 </manifest>

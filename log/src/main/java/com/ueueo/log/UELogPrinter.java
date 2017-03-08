@@ -1,27 +1,34 @@
 package com.ueueo.log;
 
-import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * Logger is a wrapper for logging utils
  * But more pretty, simple and powerful
  */
-final class UELogPrinter {
+public final class UELogPrinter {
 
     /**
      * Android's max limit for a log entry is ~4076 bytes,
@@ -52,45 +59,19 @@ final class UELogPrinter {
     private static final String TOP_BORDER = TOP_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
     private static final String BOTTOM_BORDER = BOTTOM_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
     private static final String MIDDLE_BORDER = MIDDLE_CORNER + SINGLE_DIVIDER + SINGLE_DIVIDER;
-    private static final String HEADER_FOOTER_SEPARATOR = "3k3o9dwq";
     /**
      * Localize single tag and method count for each thread
      */
     private final ThreadLocal<String> localTag = new ThreadLocal<>();
     private final ThreadLocal<Integer> localMethodCount = new ThreadLocal<>();
-    private final ThreadLocal<Boolean> localIsSaveFile = new ThreadLocal<>();
-    /**
-     * tag is used for the Log, the name is a little different
-     * in order to differentiate the logs easily with the filter
-     */
-    private String tag;
+    private final ThreadLocal<Boolean> localIsPrintToFile = new ThreadLocal<>();
+
+    private final ThreadLocal<List<String>> localMessageList = new ThreadLocal<>();
+
     /**
      * It is used to determine log settings such as method count, thread info visibility
      */
-    private UELogSetting settings;
-    private StringBuffer headerMessage = new StringBuffer();
-    private StringBuffer footerMessage = new StringBuffer();
-
-    /**
-     * It is used to change the tag
-     *
-     * @param tag is the given string which will be used in Logger
-     */
-    public UELogSetting init(String tag, Application application) {
-        if (tag == null) {
-            throw new NullPointerException("tag may not be null");
-        }
-        if (tag.trim().length() == 0) {
-            throw new IllegalStateException("tag may not be empty");
-        }
-        this.tag = tag;
-        this.settings = new UELogSetting(application);
-        return settings;
-    }
-
-    public UELogSetting getSettings() {
-        return settings;
-    }
+    private UELogConfig mLogConfig = new UELogConfig();
 
     public UELogPrinter tag(String tag) {
         if (tag != null) {
@@ -104,54 +85,64 @@ final class UELogPrinter {
         return this;
     }
 
-    public UELogPrinter save(boolean save){
-        localIsSaveFile.set(save);
+    public UELogPrinter file(boolean isPrintToFile) {
+        localIsPrintToFile.set(isPrintToFile);
         return this;
     }
 
-    public UELogPrinter header(String message, Object... args) {
-        String header = createMessage(message, args);
-        if (!TextUtils.isEmpty(header)) {
-            headerMessage.append(header).append(HEADER_FOOTER_SEPARATOR);
+    UELogConfig getLogConfig() {
+        return mLogConfig;
+    }
+
+    public UELogPrinter append(String message, Object... args) {
+        String msg = createMessage(message, args);
+        if (!TextUtils.isEmpty(msg)) {
+            List<String> msgList = localMessageList.get();
+            if (msgList == null) {
+                msgList = new ArrayList<>();
+                localMessageList.set(msgList);
+            }
+            msgList.add(msg);
         }
         return this;
     }
 
-    public UELogPrinter footer(String message, Object... args) {
-        String footer = createMessage(message, args);
-        if (!TextUtils.isEmpty(footer)) {
-            footerMessage.append(footer).append(HEADER_FOOTER_SEPARATOR);
+    public UELogPrinter appendJson(String json) {
+        String msg = parseJsonMessage(json);
+        if (!TextUtils.isEmpty(msg)) {
+            List<String> msgList = localMessageList.get();
+            if (msgList == null) {
+                msgList = new ArrayList<>();
+                localMessageList.set(msgList);
+            }
+            msgList.add(msg);
         }
         return this;
     }
 
-    public UELogPrinter headerJson(String json) {
-        headerMessage.append(parseJsonMessage(json)).append(HEADER_FOOTER_SEPARATOR);
+    public UELogPrinter appendXml(String xml) {
+        String msg = parseXmlMessage(xml);
+        if (!TextUtils.isEmpty(msg)) {
+            List<String> msgList = localMessageList.get();
+            if (msgList == null) {
+                msgList = new ArrayList<>();
+                localMessageList.set(msgList);
+            }
+            msgList.add(msg);
+        }
         return this;
     }
 
-    public UELogPrinter headerXml(String xml) {
-        headerMessage.append(parseXmlMessage(xml)).append(HEADER_FOOTER_SEPARATOR);
-        return this;
-    }
-
-    public UELogPrinter headerObject(Object obj) {
-        headerMessage.append(parseObjectMessage(obj)).append(HEADER_FOOTER_SEPARATOR);
-        return this;
-    }
-
-    public UELogPrinter footerJson(String json) {
-        footerMessage.append(parseJsonMessage(json)).append(HEADER_FOOTER_SEPARATOR);
-        return this;
-    }
-
-    public UELogPrinter footerXml(String xml) {
-        footerMessage.append(parseXmlMessage(xml)).append(HEADER_FOOTER_SEPARATOR);
-        return this;
-    }
-
-    public UELogPrinter footerObject(Object obj) {
-        footerMessage.append(parseObjectMessage(obj)).append(HEADER_FOOTER_SEPARATOR);
+    public UELogPrinter appendObject(Object obj) {
+        String msg = parseObjectMessage(obj);
+        if (!TextUtils.isEmpty(msg)) {
+            List<String> msgList = localMessageList.get();
+            if (msgList == null) {
+                msgList = new ArrayList<>();
+                localMessageList.set(msgList);
+            }
+            msgList.add(msg);
+        }
         return this;
     }
 
@@ -219,19 +210,16 @@ final class UELogPrinter {
         d(parseObjectMessage(obj));
     }
 
-    public void clear() {
-        settings = null;
-    }
-
     /**
      * This method is synchronized in order to avoid messy of logs' order.
      */
     private synchronized void log(int logType, String msg, Object... args) {
-        if (logType < settings.getLogLevel()) {
+        if (logType < mLogConfig.getLogLevel()) {
             return;
         }
         String tag = getTag();
-        if (settings.isShowThreadInfo()) {
+        boolean isPrintToFile = getIsPrintToFile();
+        if (mLogConfig.isShowThreadInfo()) {
             tag += "[" + Thread.currentThread().getName() + "]";
         }
         String message = createMessage(msg, args);
@@ -241,64 +229,40 @@ final class UELogPrinter {
             message = "Empty/NULL log message";
         }
 
-        logTopBorder(logType, tag);
-        logHeaderContent(logType, tag, methodCount);
+        List<String> appendMsgList = localMessageList.get();
+        localMessageList.remove();
 
-        //get bytes of message with system's default charset (which is UTF-8 for Android)
-//        byte[] bytes = message.getBytes();
-//        int length = bytes.length;
-        if (methodCount > 0) {
-            logDivider(logType, tag);
-        }
-        String headerString = headerMessage.toString();
-        headerMessage.setLength(0);
-        if (!TextUtils.isEmpty(headerString)) {
-            String[] headers = headerString.split(HEADER_FOOTER_SEPARATOR);
-            for (String header : headers) {
-                String[] lines = header.split(System.getProperty("line.separator"));
-                for (String line : lines) {
-                    logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
-                }
-                logDivider(logType, tag);
+        if (methodCount <= 0 && (appendMsgList == null || appendMsgList.size() == 0) && !message.contains(System.getProperty("line.separator"))) {
+            //如果只是单行日志，则不加边框直接输出
+            logChunk(logType, tag, message, isPrintToFile);
+        } else {
+            logTopBorder(logType, tag, isPrintToFile);
+            logHeaderContent(logType, tag, methodCount, isPrintToFile);
+
+            if (methodCount > 0) {
+                logDivider(logType, tag, isPrintToFile);
             }
-        }
-//        if (length <= CHUNK_SIZE) {
-        logContent(logType, tag, message);
-//        }else{
-//            for (int i = 0; i < length; i += CHUNK_SIZE) {
-//                int count = Math.min(length - i, CHUNK_SIZE);
-//                //create a new String with system's default charset (which is UTF-8 for Android)
-//                logContent(logType, tag, new String(bytes, i, count));
-//            }
-//        }
-        String footerString = footerMessage.toString();
-        footerMessage.setLength(0);
-        if (!TextUtils.isEmpty(footerString)) {
-            String[] footers = footerString.split(HEADER_FOOTER_SEPARATOR);
-            for (String footer : footers) {
-                logDivider(logType, tag);
-                String[] lines = footer.split(System.getProperty("line.separator"));
-                for (String line : lines) {
-                    logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
+
+            if (appendMsgList != null && appendMsgList.size() > 0) {
+                for (String appendMsg : appendMsgList) {
+                    logContent(logType, tag, appendMsg, isPrintToFile);
+                    logDivider(logType, tag, isPrintToFile);
                 }
             }
+            logContent(logType, tag, message, isPrintToFile);
+            logBottomBorder(logType, tag, isPrintToFile);
         }
-        logBottomBorder(logType, tag);
     }
 
-    private void logTopBorder(int logType, String tag) {
-        logChunk(logType, tag, TOP_BORDER);
+    private void logTopBorder(int logType, String tag, boolean printToFile) {
+        logChunk(logType, tag, TOP_BORDER, printToFile);
     }
 
-    private void logHeaderContent(int logType, String tag, int methodCount) {
+    private void logHeaderContent(int logType, String tag, int methodCount, boolean printToFile) {
         StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-//        if (settings.isShowThreadInfo()) {
-//            logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " Thread: " + Thread.currentThread().getName());
-//            logDivider(logType, tag);
-//        }
         String level = "";
 
-        int stackOffset = getStackOffset(trace) + settings.getMethodOffset();
+        int stackOffset = getStackOffset(trace);
 
         //corresponding method count with the current stack may exceeds the stack trace. Trims the count
         if (methodCount + stackOffset > trace.length) {
@@ -323,71 +287,55 @@ final class UELogPrinter {
                     .append(trace[stackIndex].getLineNumber())
                     .append(")");
             level += "   ";
-            logChunk(logType, tag, builder.toString());
+            logChunk(logType, tag, builder.toString(), printToFile);
         }
     }
 
-    private void logBottomBorder(int logType, String tag) {
-        logChunk(logType, tag, BOTTOM_BORDER);
+    private void logBottomBorder(int logType, String tag, boolean printToFile) {
+        logChunk(logType, tag, BOTTOM_BORDER, printToFile);
     }
 
-    private void logDivider(int logType, String tag) {
-        logChunk(logType, tag, MIDDLE_BORDER);
+    private void logDivider(int logType, String tag, boolean printToFile) {
+        logChunk(logType, tag, MIDDLE_BORDER, printToFile);
     }
 
-    private void logContent(int logType, String tag, String chunk) {
+    private void logContent(int logType, String tag, String chunk, boolean printToFile) {
         String[] lines = chunk.split(System.getProperty("line.separator"));
         for (String line : lines) {
-            logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line);
+            logChunk(logType, tag, HORIZONTAL_DOUBLE_LINE + " " + line, printToFile);
         }
     }
 
-    private void logChunk(int logType, String tag, String chunk) {
-        String finalTag = formatTag(tag);
-        switch (logType) {
-            case UELogLevel.ERROR:
-                settings.getAndroidLogTool().e(finalTag, chunk);
-                if (settings.isSavaFile()) {
-                    settings.getFileLogTool().e(finalTag, chunk);
+    private void logChunk(int logType, String tag, String chunk, boolean printToFile) {
+        List<UELogTool> logTools = mLogConfig.getLogToolList();
+        for (UELogTool logTool : logTools) {
+            if (!(logTool instanceof UEFileLogTool) || printToFile) {
+                switch (logType) {
+                    case UELogLevel.ERROR:
+                        logTool.e(tag, chunk);
+                        break;
+                    case UELogLevel.INFO:
+                        logTool.i(tag, chunk);
+                        break;
+                    case UELogLevel.VERBOSE:
+                        logTool.v(tag, chunk);
+                        break;
+                    case UELogLevel.WARN:
+                        logTool.w(tag, chunk);
+                        break;
+                    case UELogLevel.ASSERT:
+                        logTool.wtf(tag, chunk);
+                        break;
+                    case UELogLevel.DEBUG:
+                        logTool.d(tag, chunk);
+                        break;
+                    default:
+                        logTool.v(tag, chunk);
+                        break;
                 }
-                break;
-            case UELogLevel.INFO:
-                settings.getAndroidLogTool().i(finalTag, chunk);
-                if (settings.isSavaFile()) {
-                    settings.getFileLogTool().i(finalTag, chunk);
-                }
-                break;
-            case UELogLevel.VERBOSE:
-                settings.getAndroidLogTool().v(finalTag, chunk);
-                if (settings.isSavaFile()) {
-                    settings.getFileLogTool().v(finalTag, chunk);
-                }
-                break;
-            case UELogLevel.WARN:
-                settings.getAndroidLogTool().w(finalTag, chunk);
-                if (settings.isSavaFile()) {
-                    settings.getFileLogTool().w(finalTag, chunk);
-                }
-                break;
-            case UELogLevel.ASSERT:
-                settings.getAndroidLogTool().wtf(finalTag, chunk);
-                if (settings.isSavaFile()) {
-                    settings.getFileLogTool().wtf(finalTag, chunk);
-                }
-                break;
-            case UELogLevel.DEBUG:
-                settings.getAndroidLogTool().d(finalTag, chunk);
-                if (settings.isSavaFile()) {
-                    settings.getFileLogTool().d(finalTag, chunk);
-                }
-                break;
-            default:
-                settings.getAndroidLogTool().v(finalTag, chunk);
-                if (settings.isSavaFile()) {
-                    settings.getFileLogTool().v(finalTag, chunk);
-                }
-                break;
+            }
         }
+
     }
 
     private String getSimpleClassName(String name) {
@@ -395,23 +343,30 @@ final class UELogPrinter {
         return name.substring(lastIndex + 1);
     }
 
-    private String formatTag(String tag) {
-        if (!TextUtils.isEmpty(tag)) {
-            return tag;
-        }
-        return this.tag;
-    }
-
     /**
      * @return the appropriate tag based on local or global
      */
     private String getTag() {
         String tag = localTag.get();
-        if (tag != null) {
+        if (!TextUtils.isEmpty(tag)) {
             localTag.remove();
             return tag;
         }
-        return this.tag;
+        tag = mLogConfig.getTag();
+        if (!TextUtils.isEmpty(tag)) {
+            return tag;
+        } else {
+            return UELogConfig.DEFAULT_TAG;
+        }
+    }
+
+    private boolean getIsPrintToFile() {
+        Boolean printToFile = localIsPrintToFile.get();
+        if (printToFile != null) {
+            localIsPrintToFile.remove();
+            return printToFile;
+        }
+        return this.mLogConfig.isPrintToFile();
     }
 
     private String createMessage(String message, Object... args) {
@@ -420,7 +375,7 @@ final class UELogPrinter {
 
     private int getMethodCount() {
         Integer count = localMethodCount.get();
-        int result = settings.getMethodCount();
+        int result = mLogConfig.getMethodCount();
         if (count != null) {
             localMethodCount.remove();
             result = count;

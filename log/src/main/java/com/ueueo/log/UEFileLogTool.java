@@ -1,9 +1,13 @@
 package com.ueueo.log;
 
-import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,12 +23,11 @@ public class UEFileLogTool implements UELogTool {
     private static HashMap<String, File> mLogFiles = new HashMap<>();
 
     /**
-     * 日志文件存储路径为程序内的Log文件夹下
-     *
-     * @param context
+     * 日志文件存储路径为外部存储UELog文件夹下
      */
-    public UEFileLogTool(Context context) {
-        LOG_DIR_PATH = context.getExternalFilesDir("LOG").getAbsolutePath();
+    public UEFileLogTool() {
+        File file = new File(Environment.getExternalStorageDirectory(), "UELOG");
+        LOG_DIR_PATH = file.getAbsolutePath();
     }
 
     @Override
@@ -65,9 +68,10 @@ public class UEFileLogTool implements UELogTool {
      * @param msg
      */
     private synchronized void writeToFile(int priority, String tag, String msg) {
-        File logFile = mLogFiles.get(tag);
+        String trueTag = tag.split("\\[")[0];
+        File logFile = mLogFiles.get(trueTag);
         if (logFile == null) {
-            File logDir = new File(LOG_DIR_PATH, tag);
+            File logDir = new File(LOG_DIR_PATH, trueTag);
             if (!logDir.exists()) {
                 logDir.mkdirs();
             }
@@ -82,7 +86,7 @@ public class UEFileLogTool implements UELogTool {
                 } catch (IOException e) {
                 }
             }
-            mLogFiles.put(tag, logFile);
+            mLogFiles.put(trueTag, logFile);
         }
         BufferedWriter bufWriter = null;
         OutputStreamWriter out = null;

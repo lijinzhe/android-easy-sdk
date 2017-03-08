@@ -3,6 +3,7 @@ package com.ueueo.sample;
 import android.content.Intent;
 
 import com.ueueo.sample.glidetransfer.GlideTransferActivity;
+import com.ueueo.sample.log.LogActivity;
 import com.ueueo.sample.pulltorefresh.PullToRefreshActivity;
 import com.ueueo.sample.rxjava.RxJavaActivity;
 import com.ueueo.sample.widget.WidgetActivity;
@@ -36,6 +37,13 @@ public class MainActivity extends AbsListActivity {
             @Override
             public void onItemClick() {
                 Intent intent = new Intent(MainActivity.this, RxJavaActivity.class);
+                startActivity(intent);
+            }
+        });
+        addItemData(new ItemObject("Log") {
+            @Override
+            public void onItemClick() {
+                Intent intent = new Intent(MainActivity.this, LogActivity.class);
                 startActivity(intent);
             }
         });
