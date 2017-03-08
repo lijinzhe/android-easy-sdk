@@ -25,20 +25,14 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 /**
- * Logger is a wrapper for logging utils
- * But more pretty, simple and powerful
+ * 日志打印机
+ * <p>
+ * 负责日志的格式化和打印
  */
 public final class UELogPrinter {
 
     /**
-     * Android's max limit for a log entry is ~4076 bytes,
-     * so 4000 bytes is used as chunk size since default charset
-     * is UTF-8
-     */
-//    private static final int CHUNK_SIZE = 4000;
-
-    /**
-     * It is used for json pretty print
+     * Json缩紧
      */
     private static final int JSON_INDENT = 4;
 
@@ -183,11 +177,6 @@ public final class UELogPrinter {
         log(UELogLevel.ASSERT, message, args);
     }
 
-    /**
-     * Formats the json content and print it
-     *
-     * @param json the json content
-     */
     public void json(String json) {
         d(parseJsonMessage(json));
     }
@@ -403,6 +392,12 @@ public final class UELogPrinter {
         return -1;
     }
 
+    /**
+     * 格式化xml字符串
+     *
+     * @param xml
+     * @return
+     */
     private String parseXmlMessage(String xml) {
         if (!TextUtils.isEmpty(xml)) {
             try {
@@ -421,6 +416,12 @@ public final class UELogPrinter {
         }
     }
 
+    /**
+     * 格式化json字符串
+     *
+     * @param json
+     * @return
+     */
     private String parseJsonMessage(String json) {
         if (!TextUtils.isEmpty(json)) {
             try {
@@ -444,6 +445,12 @@ public final class UELogPrinter {
         }
     }
 
+    /**
+     * 格式化对象
+     *
+     * @param obj
+     * @return
+     */
     private String parseObjectMessage(Object obj) {
         if (obj != null) {
             try {

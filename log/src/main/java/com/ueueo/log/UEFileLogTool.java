@@ -13,7 +13,11 @@ import java.util.Date;
 import java.util.HashMap;
 
 /**
- * 可以将日志打印到文件中
+ * 文件输出Log
+ * <p>
+ * 将日志输出到文件中
+ * <p>
+ * 日志文件存储在外部存储空间的UELOG文件夹下
  */
 public class UEFileLogTool implements UELogTool {
 

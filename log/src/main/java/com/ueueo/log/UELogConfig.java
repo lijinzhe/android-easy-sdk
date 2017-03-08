@@ -9,13 +9,14 @@ import java.util.List;
 public final class UELogConfig {
 
     public static final String DEFAULT_TAG = "UEUEO";
-    /**
-     * tag is used for the Log, the name is a little different
-     * in order to differentiate the logs easily with the filter
-     */
+
+    //日志的Tag
     private String tag;
+    //显示方法调用栈数量
     private int methodCount = 1;
+    //是否显示线程信息
     private boolean showThreadInfo = true;
+    //是否输出到文件
     private boolean printToFile = false;
 
     private List<UELogTool> logToolList = new ArrayList<>();

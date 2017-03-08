@@ -2,6 +2,9 @@ package com.ueueo.log;
 
 import android.util.Log;
 
+/**
+ * Android控制台输出Log
+ */
 public class UEAndroidLogTool implements UELogTool {
     @Override
     public void d(String tag, String message) {

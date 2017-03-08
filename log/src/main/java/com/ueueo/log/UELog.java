@@ -13,40 +13,88 @@ package com.ueueo.log;
  */
 public final class UELog {
 
+    //日志打印机
     private static UELogPrinter printer = new UELogPrinter();
 
-    //no instance
     private UELog() {
     }
 
+    /**
+     * 初始化全局配置
+     *
+     * @param tag 全局标签（默认为UEUEO）
+     */
     public static void init(String tag) {
         printer.getLogConfig().tag(tag);
     }
 
+    /**
+     * 初始化全局配置
+     *
+     * @param tag         全局标签（默认为UEUEO）
+     * @param methodCount 全局显示方法调用栈数量（默认为1）
+     */
     public static void init(String tag, int methodCount) {
         printer.getLogConfig().tag(tag).methodCount(methodCount);
     }
 
+    /**
+     * 初始化全局配置
+     *
+     * @param tag         全局Tag（默认为UEUEO）
+     * @param methodCount 全局显示方法调用栈数量（默认为1）
+     * @param printToFile 全局是否输出到文件中（默认为否）
+     */
     public static void init(String tag, int methodCount, boolean printToFile) {
         printer.getLogConfig().tag(tag).methodCount(methodCount).printToFile(printToFile);
     }
 
+    /**
+     * 添加新的日志输入工具
+     *
+     * @param logTool
+     */
     public static void addLogTool(UELogTool logTool) {
         printer.getLogConfig().addLogTool(logTool);
     }
 
+    /**
+     * 指定当前这条Log信息打印的tag，不受全局配置影响
+     *
+     * @param tag
+     * @return
+     */
     public static UELogPrinter tag(String tag) {
         return printer.tag(tag);
     }
 
+    /**
+     * 指定当前这条Log信息打印的方法调用栈数量，不受全局配置影响
+     *
+     * @param methodCount
+     * @return
+     */
     public static UELogPrinter method(int methodCount) {
         return printer.method(methodCount);
     }
 
+    /**
+     * 指定当前这条Log信息是否打印到文件，不受全局配置影响
+     *
+     * @param file
+     * @return
+     */
     public static UELogPrinter file(boolean file) {
         return printer.file(file);
     }
 
+    /**
+     * 拼接日志，每条日志之间会有分割线分割
+     *
+     * @param message
+     * @param args
+     * @return
+     */
     public static UELogPrinter append(String message, Object... args) {
         printer.append(message, args);
         return printer;
@@ -95,29 +143,14 @@ public final class UELog {
         printer.wtf(message, args);
     }
 
-    /**
-     * Formats the json content and print it
-     *
-     * @param json the json content
-     */
     public static void json(String json) {
         printer.json(json);
     }
 
-    /**
-     * Formats the json content and print it
-     *
-     * @param xml the xml content
-     */
     public static void xml(String xml) {
         printer.xml(xml);
     }
 
-    /**
-     * Formats the obj content and print it
-     *
-     * @param obj the xml content
-     */
     public static void object(Object obj) {
         printer.object(obj);
     }
