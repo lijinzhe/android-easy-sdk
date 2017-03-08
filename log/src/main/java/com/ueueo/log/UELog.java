@@ -1,15 +1,7 @@
 package com.ueueo.log;
 
 /**
- * Logger is a wrapper of {@link android.util.Log}
- * But more pretty, simple and powerful
- * <p/>
- * Verbose: 用来打印输出价值比较低的信息。
- * Debug: 用来打印调试信息，在Release版本不会输出。
- * Info: 用来打印一般提示信息。
- * Warn: 用来打印警告信息，这种信息一般是提示开发者需要注意，有可能会出现问题！
- * Error: 用来打印错误崩溃日志信息，例如在try-catch的catch中输出捕获的错误信息。
- * Assert: 在Log.wtf()作为参数，表明当前问题是个严重的等级。
+ * 日志输出
  */
 public final class UELog {
 
@@ -43,7 +35,7 @@ public final class UELog {
      *
      * @param tag         全局Tag（默认为UEUEO）
      * @param methodCount 全局显示方法调用栈数量（默认为1）
-     * @param printToFile 全局是否输出到文件中（默认为否）
+     * @param printToFile 全局是否输出到文件中（默认为否），如果要打印到文件需要申请文件读写权限
      */
     public static void init(String tag, int methodCount, boolean printToFile) {
         printer.getLogConfig().tag(tag).methodCount(methodCount).printToFile(printToFile);
