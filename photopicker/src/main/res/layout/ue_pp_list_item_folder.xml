@@ -12,12 +12,12 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:id="@+id/cover"
-        tools:src="@drawable/uep_btn_back"
+        tools:src="@drawable/ue_pp_btn_back"
         android:layout_gravity="center_vertical"
         android:scaleType="centerInside"
-        android:src="@drawable/uep_default_error"
-        android:layout_width="@dimen/uep_folder_cover_size"
-        android:layout_height="@dimen/uep_folder_cover_size" />
+        android:src="@drawable/ue_pp_default_error"
+        android:layout_width="@dimen/ue_pp_folder_cover_size"
+        android:layout_height="@dimen/ue_pp_folder_cover_size" />
 
     <LinearLayout
         android:layout_toRightOf="@+id/cover"
@@ -66,7 +66,7 @@
         android:id="@+id/indicator"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="20dp"
-        android:src="@drawable/uep_default_check"
+        android:src="@drawable/ue_pp_default_check"
         android:layout_gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

@@ -2,10 +2,6 @@ package com.ueueo.photopicker.bean;
 
 import android.text.TextUtils;
 
-/**
- * 图片实体
- * Created by Nereo on 2015/4/7.
- */
 public class Image {
     public String path;
     public String name;

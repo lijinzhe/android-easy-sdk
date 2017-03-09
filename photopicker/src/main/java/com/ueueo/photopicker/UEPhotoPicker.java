@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * <p/>
  * Created by Lee on 16/8/9.
  */
-public class PhotoPicker {
+public class UEPhotoPicker {
 
     static OnSingleChoiceListener mOnSingleChoiceListener;
     static OnMultipleChoiceListener mOnMultipleChoiceListener;

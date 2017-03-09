@@ -12,9 +12,9 @@ public class LogActivity extends AbsListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UELog.init("UEUEO");
-//        UELog.init("UEUEO", 5);
-        UELog.init("UEUEO", 5, UELogLevel.INFO);
-        UELog.init("UEUEO", 5, UELogLevel.INFO, true);
+        UELog.init("UEUEO", 2);
+        UELog.init("UEUEO", 3, UELogLevel.INFO);
+        UELog.init("UEUEO", 4, UELogLevel.INFO, true);
 
     }
 
@@ -42,6 +42,14 @@ public class LogActivity extends AbsListActivity {
             @Override
             public void onItemClick() {
                 UELog.i("普通日志输出");
+                UELog.i("第一行日志 \n 换行输出日志");
+            }
+        });
+        addItemData(new ItemObject("多行日志") {
+            @Override
+            public void onItemClick() {
+                UELog.init("UEUEO", 0);
+                UELog.i("第一行日志 \n 换行输出日志");
             }
         });
         addItemData(new ItemObject("设置输出方法调用栈数为3") {
@@ -127,7 +135,13 @@ public class LogActivity extends AbsListActivity {
         addItemData(new ItemObject("自定义当前日志配置") {
             @Override
             public void onItemClick() {
-                UELog.tag("LI").method(2).file(true).i("指定Tag为LI，方法调用栈显示2，日志写入文件");
+                UELog.init("AAA");
+
+                UELog.i("输出的日志Tag是AAA");
+
+                UELog.tag("BBB").method(3).file(true).i("输出的日志Tag是BBB");
+
+                UELog.i("再次输出的日志Tag是AAA");
             }
         });
         addItemData(new ItemObject("指定参数的日志") {

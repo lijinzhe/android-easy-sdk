@@ -5,7 +5,7 @@
     <com.ueueo.photopicker.view.SquaredImageView
         android:id="@+id/image"
         android:scaleType="centerInside"
-        android:src="@drawable/uep_default_error"
+        android:src="@drawable/ue_pp_default_error"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -23,6 +23,6 @@
         android:layout_marginRight="5.5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/uep_btn_unselected"/>
+        android:src="@drawable/ue_pp_btn_unselected"/>
 
 </com.ueueo.photopicker.view.SquareFrameLayout>

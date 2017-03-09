@@ -16,14 +16,7 @@ import android.widget.Button;
 import java.io.File;
 import java.util.ArrayList;
 
-/**
- * Multi image selector
- * Created by Nereo on 2015/4/7.
- * Updated by nereo on 2016/1/19.
- * Updated by nereo on 2016/5/18.
- */
-public class PhotoPickerActivity extends AppCompatActivity
-        implements PhotoPickerFragment.Callback {
+public class PhotoPickerActivity extends AppCompatActivity implements PhotoPickerFragment.Callback {
 
     // Single choice
     public static final int MODE_SINGLE = 0;
@@ -56,8 +49,8 @@ public class PhotoPickerActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(R.style.UEP_NO_ACTIONBAR);
-        setContentView(R.layout.uep_activity_default);
+        setTheme(R.style.ue_pp_no_actionbar);
+        setContentView(R.layout.ue_pp_activity);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.BLACK);
@@ -90,9 +83,9 @@ public class PhotoPickerActivity extends AppCompatActivity
                 public void onClick(View view) {
                     if (resultList != null && resultList.size() > 0) {
                         // Notify success
-                        if (PhotoPicker.mOnMultipleChoiceListener != null) {
-                            PhotoPicker.mOnMultipleChoiceListener.onMultipleChosed(resultList);
-                            PhotoPicker.mOnMultipleChoiceListener = null;
+                        if (UEPhotoPicker.mOnMultipleChoiceListener != null) {
+                            UEPhotoPicker.mOnMultipleChoiceListener.onMultipleChosed(resultList);
+                            UEPhotoPicker.mOnMultipleChoiceListener = null;
                         }
                     }
                     finish();
@@ -124,21 +117,21 @@ public class PhotoPickerActivity extends AppCompatActivity
     private void updateDoneText(ArrayList<String> resultList) {
         int size = 0;
         if (resultList == null || resultList.size() <= 0) {
-            mSubmitButton.setText(R.string.uep_action_done);
+            mSubmitButton.setText(R.string.ue_pp_action_done);
             mSubmitButton.setEnabled(false);
         } else {
             size = resultList.size();
             mSubmitButton.setEnabled(true);
         }
-        mSubmitButton.setText(getString(R.string.uep_action_button_string,
-                getString(R.string.uep_action_done), size, mDefaultCount));
+        mSubmitButton.setText(getString(R.string.ue_pp_action_button_string,
+                getString(R.string.ue_pp_action_done), size, mDefaultCount));
     }
 
     @Override
     public void onSingleImageSelected(String path) {
-        if (PhotoPicker.mOnSingleChoiceListener != null) {
-            PhotoPicker.mOnSingleChoiceListener.onSingleChosed(path);
-            PhotoPicker.mOnSingleChoiceListener = null;
+        if (UEPhotoPicker.mOnSingleChoiceListener != null) {
+            UEPhotoPicker.mOnSingleChoiceListener.onSingleChosed(path);
+            UEPhotoPicker.mOnSingleChoiceListener = null;
         }
         finish();
     }
@@ -165,22 +158,22 @@ public class PhotoPickerActivity extends AppCompatActivity
             // notify system the image has change
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(imageFile)));
 
-            if (PhotoPicker.mOnSingleChoiceListener != null) {
-                PhotoPicker.mOnSingleChoiceListener.onSingleChosed(imageFile.getAbsolutePath());
-                PhotoPicker.mOnSingleChoiceListener = null;
+            if (UEPhotoPicker.mOnSingleChoiceListener != null) {
+                UEPhotoPicker.mOnSingleChoiceListener.onSingleChosed(imageFile.getAbsolutePath());
+                UEPhotoPicker.mOnSingleChoiceListener = null;
             }
-            if (PhotoPicker.mOnMultipleChoiceListener != null) {
+            if (UEPhotoPicker.mOnMultipleChoiceListener != null) {
                 resultList.add(imageFile.getAbsolutePath());
-                PhotoPicker.mOnMultipleChoiceListener.onMultipleChosed(resultList);
-                PhotoPicker.mOnMultipleChoiceListener = null;
+                UEPhotoPicker.mOnMultipleChoiceListener.onMultipleChosed(resultList);
+                UEPhotoPicker.mOnMultipleChoiceListener = null;
             }
             finish();
         }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == android.R.id.home){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
@@ -190,6 +183,6 @@ public class PhotoPickerActivity extends AppCompatActivity
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.uep_slide_right_in, R.anim.uep_slide_right_out);
+        overridePendingTransition(R.anim.ue_pp_slide_right_in, R.anim.ue_pp_slide_right_out);
     }
 }

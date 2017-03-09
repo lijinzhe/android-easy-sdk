@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 
+/**
+ * 权限申请
+ */
 public class PermissionActivity extends Activity {
 
     @Override

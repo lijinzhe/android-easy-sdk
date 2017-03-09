@@ -42,12 +42,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * Multi image selector Fragment
- * Created by Nereo on 2015/4/7.
- * Updated by nereo on 2016/5/18.
- */
 public class PhotoPickerFragment extends Fragment {
 
     public static final String TAG = "MultiImageSelectorFragment";
@@ -201,7 +195,7 @@ public class PhotoPickerFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.uep_fragment_multi_image, container, false);
+        return inflater.inflate(R.layout.ue_pp_fragment_multi_image, container, false);
     }
 
     @Override
@@ -221,7 +215,7 @@ public class PhotoPickerFragment extends Fragment {
         mPopupAnchorView = view.findViewById(R.id.footer);
 
         mCategoryText = (TextView) view.findViewById(R.id.category_btn);
-        mCategoryText.setText(R.string.uep_folder_all);
+        mCategoryText.setText(R.string.ue_pp_folder_all);
         mCategoryText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -293,7 +287,7 @@ public class PhotoPickerFragment extends Fragment {
 
                         if (index == 0) {
                             getActivity().getSupportLoaderManager().restartLoader(LOADER_ALL, null, mLoaderCallback);
-                            mCategoryText.setText(R.string.uep_folder_all);
+                            mCategoryText.setText(R.string.ue_pp_folder_all);
                             if (showCamera()) {
                                 mImageAdapter.setShowCamera(true);
                             } else {
@@ -377,14 +371,14 @@ public class PhotoPickerFragment extends Fragment {
      */
     private void showCameraAction() {
         if (selectImageCount() == resultList.size()) {
-            Toast.makeText(getActivity(), R.string.uep_msg_amount_limit, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.ue_pp_msg_amount_limit, Toast.LENGTH_SHORT).show();
             return;
         }
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, 102);
 
-        }else {
+        } else {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
                 try {
@@ -396,17 +390,18 @@ public class PhotoPickerFragment extends Fragment {
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mTmpFile));
                     startActivityForResult(intent, REQUEST_CAMERA);
                 } else {
-                    Toast.makeText(getActivity(), R.string.uep_error_image_not_exist, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.ue_pp_error_image_not_exist, Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(getActivity(), R.string.uep_msg_no_camera, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.ue_pp_msg_no_camera, Toast.LENGTH_SHORT).show();
             }
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == 102){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 102) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showCameraAction();
             }
         } else {
@@ -429,7 +424,7 @@ public class PhotoPickerFragment extends Fragment {
                     }
                 } else {
                     if (selectImageCount() == resultList.size()) {
-                        Toast.makeText(getActivity(), R.string.uep_msg_amount_limit, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.ue_pp_msg_amount_limit, Toast.LENGTH_SHORT).show();
                         return;
                     }
                     resultList.add(image.path);

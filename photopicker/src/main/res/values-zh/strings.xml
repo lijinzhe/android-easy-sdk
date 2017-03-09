@@ -1,9 +1,9 @@
 <resources>
-    <string name="uep_folder_all">所有照片</string>
-    <string name="uep_msg_no_camera">没有系统相机</string>
-    <string name="uep_msg_amount_limit">已经达到最高选择数量</string>
-    <string name="uep_action_done">完成</string>
-    <string name="uep_photo_unit">张</string>
-    <string name="uep_tip_take_photo">拍摄照片</string>
-    <string name="uep_error_image_not_exist">图片错误</string>
+    <string name="ue_pp_folder_all">所有照片</string>
+    <string name="ue_pp_msg_no_camera">没有系统相机</string>
+    <string name="ue_pp_msg_amount_limit">已经达到最高选择数量</string>
+    <string name="ue_pp_action_done">完成</string>
+    <string name="ue_pp_photo_unit">张</string>
+    <string name="ue_pp_tip_take_photo">拍摄照片</string>
+    <string name="ue_pp_error_image_not_exist">图片错误</string>
 </resources>
